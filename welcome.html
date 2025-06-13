@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bem-vindo ao Capi Valley</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      background: url('/img/capa\ de\ carregamento.Jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .welcome-container {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      padding-bottom: 140px;
+    }
+
+    .btn-entrar {
+      font-size: 1.5rem;
+      padding: 10px 10px;
+      border-radius: 30px;
+      background: linear-gradient(145deg, #8b4513, #6a2c0e);
+      color: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-entrar:before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('https://www.example.com/imagens/texture-tronco.jpg') center center no-repeat;
+      background-size: cover;
+      opacity: 0.1;
+      z-index: 2;
+    }
+
+    .btn-entrar span {
+      position: relative;
+      z-index: 3;
+    }
+    
+    .btn-entrar:hover {
+      background: linear-gradient(145deg, #a65d1f, #8b4513);
+      z-index: 2;
+    }
+
+    .spinner-border {
+      width: 2rem;
+      height: 2rem;
+      border-width: 0.3em;
+      border-top-color:#fff;
+    }
+  </style>
+</head>
+<body>
+   <div class="welcome-container">
+    <a href="javascript:void(0)" class="btn btn-entrar" id="btnEntrar" onclick="showLoading()">
+      <span id="btnTexto">Toque para iniciar</span>
+      <div id="loading" style="display: none;">
+        <div class="spinner-border text-light" role="status">
+          <span class="visually-hidden">Carregando...</span>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <script>
+    function showLoading() {
+      document.getElementById('btnTexto').style.display = 'none';
+      document.getElementById('loading').style.display = 'block';
+
+      setTimeout(function() {
+        window.location.href = 'select.html';
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

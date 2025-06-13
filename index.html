@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d6efd">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" sizes="192x192" href="icon.png">
+  <title>Jogo da Memória</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: url('/img/basememoria.png') no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .card {
+      width: 100%;
+      height: 70px;
+      background-color: #f8f9fa;
+      border: 1px solid #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .card img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    .matched {
+      background-color: #198754;
+    }
+    .hidden {
+      background: url('');
+      background-color: #2a792e;
+    }
+    .game-board {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      width: 80vw;
+      max-width: 1000px;
+    }
+    .col {
+      flex: 0 0 30%;
+    }
+    .menu {
+      position: fixed;
+      top: 20px;
+      right: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: #333;
+      color: white;
+      padding: 20px;
+      transition: right 0.3s ease;
+    }
+    .menu a {
+      color: white;
+      text-decoration: none;
+      display: block;
+      padding: 10px 0;
+      font-size: 18px;
+      border-bottom: 1px solid #444;
+    }
+    .menu a:hover {
+      background-color: #444;
+    }
+    .hamburger {
+      position: fixed;
+      top: 1px;
+      right: 3px;
+      background: none;
+      border: none;
+      color: #f8f9fa;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 1000;
+      padding: 10px;
+    }
+    .hamburger:focus {
+      outline: none;
+    }
+    .menu.open {
+      right: 0;
+    }
+    @media (max-width: 768px) {
+      .game-board {
+        width: 90vw;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <button class="hamburger" id="hamburgerBtn">&#9776;</button>
+  <div class="menu" id="menu">
+    <a href="#">Início</a>
+    <a href="#">Sobre</a>
+    <a href="#">Ranking</a>
+    <a href="#">Configurações</a>
+  </div>
+  
+  <div class="container">
+    <div class="row row-cols-3 g-3 game-board" id="gameBoard"></div>
+  </div>
+
+  <script>
+    const images = ["🍎", "🍌", "🍇", "🍉", "🍓", "🍍"];
+    let cards = [];
+    let firstCard = null;
+    let secondCard = null;
+    let canClick = false;
+    let matches = 0;
+    let currentPlayer = 1;
+    let scores = { 1: 0, 2: 0 };
+
+    const gameBoard = document.getElementById("gameBoard");
+
+    function initGame() {
+      cards = [...images, ...images].sort(() => 0.5 - Math.random());
+      gameBoard.innerHTML = "";
+      cards.forEach((img, index) => {
+        const col = document.createElement("div");
+        col.className = "col";
+        const card = document.createElement("div");
+        card.className = "card hidden";
+        card.dataset.index = index;
+        card.dataset.value = img;
+        card.addEventListener("click", () => revealCard(card));
+        col.appendChild(card);
+        gameBoard.appendChild(col);
+      });
+      firstCard = null;
+      secondCard = null;
+      matches = 0;
+      scores = { 1: 0, 2: 0 };
+    }
+
+    function startGame() {
+      const cardsEl = document.querySelectorAll(".card");
+      cardsEl.forEach(card => {
+        card.textContent = card.dataset.value;
+        card.classList.remove("hidden");
+      });
+      canClick = false;
+      setTimeout(() => {
+        cardsEl.forEach(card => {
+          card.textContent = "";
+          card.classList.add("hidden");
+        });
+        canClick = true;
+      }, 3000);
+    }
+
+    function revealCard(card) {
+      if (!canClick || card.textContent || card.classList.contains("matched")) return;
+      card.textContent = card.dataset.value;
+      card.classList.remove("hidden");
+
+      if (!firstCard) {
+        firstCard = card;
+      } else {
+        secondCard = card;
+        canClick = false;
+        if (firstCard.dataset.value === secondCard.dataset.value) {
+          firstCard.classList.add("matched");
+          secondCard.classList.add("matched");
+          scores[currentPlayer]++;
+          matches++;
+          resetTurn();
+          if (matches === images.length) endGame();
+        } else {
+          setTimeout(() => {
+            firstCard.textContent = "";
+            secondCard.textContent = "";
+            firstCard.classList.add("hidden");
+            secondCard.classList.add("hidden");
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            resetTurn();
+          }, 1000);
+        }
+      }
+    }
+
+    function resetTurn() {
+      firstCard = null;
+      secondCard = null;
+      canClick = true;
+    }
+
+    function endGame() {
+      canClick = false;
+      const vencedor = scores[1] > scores[2] ? "Jogador 1" : scores[2] > scores[1] ? "Jogador 2" : "Empate";
+      alert(`Fim de jogo! Vencedor: ${vencedor}`);
+    }
+
+    // Inicialização
+    initGame();
+    startGame();
+
+    // Menu de hambúrguer
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    const menu = document.getElementById("menu");
+
+    hamburgerBtn.addEventListener("click", () => {
+      menu.classList.toggle("open");
+    });
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log("✅ Service Worker registrado"))
+        .catch(err => console.log("Erro ao registrar o SW", err));
+    }
+  </script>
+</body>
+
+</html>
