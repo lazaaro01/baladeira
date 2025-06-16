@@ -1,7 +1,7 @@
-const CACHE_NAME = "memoria-cache-v1";
+const CACHE_NAME = "cacanicks-cache-v1";
 const urlsToCache = [
     "/",
-    "/memoria.html",
+    "/index.html",
     "/manifest.json",
     "/icon-192.png",
     "/icon-512.png",
@@ -10,17 +10,7 @@ const urlsToCache = [
 self.addEventListener("install", (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            console.log('Cacheando arquivos')
             return cache.addAll(urlsToCache);
         })
     );
-});
-
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((cachedResponse) => {
-        return cachedResponse || fetch(event.request);
-      })
-  );
 });
