@@ -56,7 +56,6 @@
       touch-action: manipulation;
     }
 
-    
     .tiles-container {
       margin-top: 20px; 
       display: grid;
@@ -72,6 +71,13 @@
       background-size: 300px 300px;
       border: 1px solid #aaa;
       touch-action: manipulation;
+      transition: border-color 0.3s ease;
+    }
+
+    /* Adiciona a borda verde quando a peça é colocada corretamente */
+    .draggable.correct {
+      border-color: green !important; /* Borda verde */
+      pointer-events: none; /* Impede mover a peça após o encaixe */
     }
 
     .btn-restart {
@@ -191,7 +197,12 @@
 
       if (draggedTile && !targetTile.hasChildNodes()) {
         targetTile.appendChild(draggedTile);
-        checkVictory();
+
+        // Verifica se a peça foi colocada corretamente
+        if (targetTile.dataset.index == draggedTile.dataset.index) {
+          draggedTile.classList.add('correct'); // Marca a peça como correta
+          checkVictory();
+        }
       }
     }
 
@@ -214,7 +225,6 @@
       createDraggableTiles();
     }
 
-  
     const hamburger = document.getElementById('hamburgerBtn');
     const menu = document.getElementById('menu');
     hamburger.addEventListener('click', () => {
