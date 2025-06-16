@@ -13,18 +13,24 @@
       text-align: center;
       padding: 20px;
       user-select: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      min-height: 100vh;
     }
 
     h1 {
       margin-bottom: 20px;
       color: #8d4b00;
     }
-
     .puzzle-container {
       position: relative;
-      width: 240px; 
-      height: 240px;
-      margin: 150px auto 20px auto;
+      width: 90vw; 
+      height: 90vw; 
+      max-width: 300px; 
+      max-height: 300px; 
+      margin-top: 150px; 
       border: 2px solid #ccc;
       background-image: url('quebra cabeça 2.png');
       background-size: cover;
@@ -36,7 +42,6 @@
     .puzzle-container.completed {
       opacity: 2 !important;
     }
-
     .puzzle-board {
       position: absolute;
       top: 0;
@@ -50,32 +55,36 @@
     }
 
     .tile {
-      width: 80px;
-      height: 80px; 
+      width: 100%;
+      height: 100%; 
       border: 1px solid #999;
       touch-action: manipulation;
     }
 
+    
     .tiles-container {
-      margin-top: 50px; 
+      margin-top: 50px;
       display: flex;
       justify-content: center;
       gap: 10px;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
     }
 
     .draggable {
-      width: 80px; 
-      height: 80px; 
+      width: 100px; 
+      height: 100px; 
       background-image: url('quebra cabeça 2.png');
-      background-size: 240px 240px; 
-      border: 1px solid #aaa;
+      background-size: 300px 300px; 
+      background-position: center;
+      border: 2px solid #aaa;
       touch-action: manipulation;
+      cursor: pointer;
     }
 
     .btn-restart {
       margin-top: 20px;
     }
-
     .menu {
       position: fixed;
       top: 20px;
@@ -122,6 +131,21 @@
     .menu.open {
       right: 0;
     }
+
+    @media (max-width: 600px) {
+      
+      .puzzle-container {
+        width: 80vw; 
+        height: 80vw; 
+      }
+
+      .draggable {
+        width: 80px; 
+        height: 80px; 
+        background-size: 240px 240px; 
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -145,7 +169,7 @@
     const tilesContainer = document.getElementById('tilesContainer');
     const puzzleContainer = document.getElementById('puzzleContainer');
     const size = 3;
-    const tileSize = 80; 
+    const tileSize = 100; 
 
     function createDropZones() {
       board.innerHTML = '';
@@ -212,13 +236,11 @@
       createDraggableTiles();
     }
 
-
     const hamburger = document.getElementById('hamburgerBtn');
     const menu = document.getElementById('menu');
     hamburger.addEventListener('click', () => {
       menu.classList.toggle('open');
     });
-
 
     window.onload = startPuzzle;
   </script>
