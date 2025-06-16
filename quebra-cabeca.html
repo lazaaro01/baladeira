@@ -1,62 +1,54 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0d6efd">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" sizes="192x192" href="icon.png">
-  <title>Jogo da Memória</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quebra-Cabeça</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
     body {
       background: url('basememoria.png') no-repeat center center fixed;
       background-size: cover;
-      height: 100vh;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-    .card {
-      width: 100%;
-      height: 70px;
-      background-color: #2a792e;
-      border: 1px solid #ccc;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 2rem;
-      cursor: pointer;
+      font-family: 'Roboto', sans-serif;
+      text-align: center;
+      padding: 20px;
       user-select: none;
     }
-    .card img {
-      max-width: 100%;
-      max-height: 100%;
+
+    h1 {
+      margin-bottom: 20px;
+      color: #8d4b00;
     }
-    .matched {
-      background-color: #08b062;
+
+    .puzzle-board {
+      width: 300px;
+      height: 300px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 2px;
+      background: #000;
     }
+
+    .tile {
+      background-image: url('quebra cabeça 2.png');
+      background-size: 300px 300px;
+      width: 100%;
+      height: 100%;
+      touch-action: manipulation;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
     .hidden {
-      background:  url('icons baladeira.png') no-repeat center center;
-      background-color: #2a792e;
-      background-size: 60px 60px;
+      visibility: hidden;
     }
-    .game-board {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      width: 80vw;
-      max-width: 1000px;
+
+    .btn-restart {
+      margin-top: 20px;
     }
-    .col {
-      flex: 0 0 30%;
-    }
-    .menu {
+     .menu {
       position: fixed;
       top: 20px;
       right: -250px;
@@ -96,15 +88,10 @@
     .menu.open {
       right: 0;
     }
-    @media (max-width: 768px) {
-      .game-board {
-        width: 90vw;
-      }
-    }
   </style>
 </head>
-
 <body>
+
   <button class="hamburger" id="hamburgerBtn">&#9776;</button>
   <div class="menu" id="menu">
     <a href="#">Início</a>
@@ -112,142 +99,78 @@
     <a href="#">Ranking</a>
     <a href="#">Configurações</a>
   </div>
-  
-  <div class="container">
-    <div class="row row-cols-3 g-3 game-board" id="gameBoard"></div>
-  </div>
+  <div class="puzzle-board" id="puzzleBoard"></div>
+
+  <button class="btn btn-warning btn-restart" onclick="startPuzzle()">Reiniciar</button>
 
   <script>
-    const images = [
-      "Cacá.png",
-      "Capitu.png",
-      "Patoca.png",
-      "Noar.png",
-      "Sapoti.png"
-    ];
-    let cards = [];
-    let firstCard = null;
-    let secondCard = null;
-    let canClick = false;
-    let matches = 0;
-    let currentPlayer = 1;
-    let scores = { 1: 0, 2: 0 };
+    const board = document.getElementById('puzzleBoard');
+    const size = 3; // 3x3
+    let tiles = [];
 
-    const gameBoard = document.getElementById("gameBoard");
-
-    function initGame() {
-      cards = [...images, ...images].sort(() => 0.5 - Math.random());
-      gameBoard.innerHTML = "";
-      cards.forEach((img, index) => {
-        const col = document.createElement("div");
-        col.className = "col";
-        const card = document.createElement("div");
-        card.className = "card hidden";
-        card.dataset.index = index;
-        card.dataset.value = img;
-        card.addEventListener("click", () => revealCard(card));
-        col.appendChild(card);
-        gameBoard.appendChild(col);
-      });
-      firstCard = null;
-      secondCard = null;
-      matches = 0;
-      scores = { 1: 0, 2: 0 };
-    }
-
-    function startGame() {
-      const cardsEl = document.querySelectorAll(".card");
-      cardsEl.forEach(card => {
-        const img = document.createElement("img");
-        img.src = card.dataset.value;
-        card.innerHTML = "";
-        card.appendChild(img);
-        card.classList.remove("hidden");
-      });
-      canClick = false;
-      setTimeout(() => {
-        cardsEl.forEach(card => {
-          card.innerHTML = "";
-          card.classList.add("hidden");
-        });
-        canClick = true;
-      }, 3000);
-    }
-
-    function revealCard(card) {
-      if (!canClick || card.classList.contains("matched")) return;
-      
-      const img = document.createElement("img");
-      img.src = card.dataset.value;
-
-      img.onerror = () => {
-        console.error("Erro ao carregar a imagem:", img.src);
-        img.alt = "Imagem não encontrada";
-        img.style.background = "red";
-        img.style.color = "white";
-      };
-
-      card.innerHTML = "";
-      card.appendChild(img);
-      card.classList.remove("hidden");
-
-      if (!firstCard) {
-        firstCard = card;
-      } else {
-        secondCard = card;
-        canClick = false;
-        if (firstCard.dataset.value === secondCard.dataset.value) {
-          firstCard.classList.add("matched");
-          secondCard.classList.add("matched");
-          scores[currentPlayer]++;
-          matches++;
-          resetTurn();
-          if (matches === images.length) endGame();
-        } else {
-          setTimeout(() => {
-            firstCard.innerHTML = "";
-            secondCard.innerHTML = "";
-            firstCard.classList.add("hidden");
-            secondCard.classList.add("hidden");
-            currentPlayer = currentPlayer === 1 ? 2 : 1;
-            resetTurn();
-          }, 1000);
+    function createTiles() {
+      tiles = [];
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          const index = row * size + col;
+          tiles.push({
+            index: index,
+            top: row * 100,
+            left: col * 100,
+            row,
+            col
+          });
         }
+      }
+      tiles.pop(); 
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
       }
     }
 
-    function resetTurn() {
-      firstCard = null;
-      secondCard = null;
-      canClick = true;
+    function drawBoard() {
+      board.innerHTML = '';
+      tiles.forEach((tile, i) => {
+        const div = document.createElement('div');
+        div.classList.add('tile');
+        div.style.backgroundPosition = `-${tile.left}px -${tile.top}px`;
+        div.dataset.index = i;
+        div.onclick = () => swapTiles(i);
+        board.appendChild(div);
+      });
+
+      // peça em branco
+      const blank = document.createElement('div');
+      blank.classList.add('tile', 'hidden');
+      board.appendChild(blank);
     }
 
-    function endGame() {
-      canClick = false;
-      const vencedor = scores[1] > scores[2] ? "Jogador 1" : scores[2] > scores[1] ? "Jogador 2" : "Empate";
-      alert(`Fim de jogo! Vencedor: ${vencedor}`);
+    function swapTiles(i) {
+      const blankIndex = tiles.length;
+      const clickedTile = tiles[i];
+      const rowDiff = Math.abs(clickedTile.row - Math.floor(blankIndex / size));
+      const colDiff = Math.abs(clickedTile.col - (blankIndex % size));
+
+      if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
+        const temp = tiles[i];
+        tiles.splice(i, 1);
+        tiles.push(temp);
+        drawBoard();
+      }
     }
 
-    // Inicialização
-    initGame();
-    startGame();
-
-    // Menu de hambúrguer
-    const hamburgerBtn = document.getElementById("hamburgerBtn");
-    const menu = document.getElementById("menu");
-
-    hamburgerBtn.addEventListener("click", () => {
-      menu.classList.toggle("open");
-    });
-  </script>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(() => console.log("✅ Service Worker registrado"))
-        .catch(err => console.log("Erro ao registrar o SW", err));
+    function startPuzzle() {
+      createTiles();
+      shuffle(tiles);
+      drawBoard();
     }
+
+    // Inicializa o jogo ao carregar
+    window.onload = startPuzzle;
   </script>
 </body>
-
 </html>
