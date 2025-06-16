@@ -1,83 +1,61 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quebra-Cabeça</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d6efd">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" sizes="192x192" href="icon.png">
+  <title>Jogo da Memória</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
     body {
       background: url('basememoria.png') no-repeat center center fixed;
       background-size: cover;
-      font-family: 'Roboto', sans-serif;
-      text-align: center;
-      padding: 20px;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .card {
+      width: 100%;
+      height: 70px;
+      background-color: #2a792e;
+      border: 1px solid #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      cursor: pointer;
       user-select: none;
     }
-
-    h1 {
-      margin-bottom: 20px;
-      color: #8d4b00;
+    .card img {
+      max-width: 100%;
+      max-height: 100%;
     }
-
-    .puzzle-container {
-      position: relative;
-      width: 300px;
-      height: 300px;
-      margin: 150px auto; /* Ajuste de margem para mover o quebra-cabeça para baixo */
-      border: 2px solid #ccc;
-      background-image: url('quebra cabeça 2.png');
-      background-size: cover;
-      background-position: center;
-      opacity: 0.5;
-      transition: opacity 0.5s ease-in-out;
+    .matched {
+      background-color: #08b062;
     }
-
-    .puzzle-container.completed {
-      opacity: 1 !important;
+    .hidden {
+      background:  url('icons baladeira.png') no-repeat center center;
+      background-color: #2a792e;
+      background-size: 60px 60px;
     }
-
-    .puzzle-board {
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      width: 100%;
-      height: 100%;
-      gap: 2px;
-    }
-
-    .tile {
-      width: 100px;
-      height: 100px;
-      border: 1px solid #999;
-      touch-action: manipulation;
-    }
-
-    /* Ajustes para as peças */
-    .tiles-container {
-      margin-top: 20px; /* Ajustei a margem para mover as peças para cima */
-      display: grid;
-      grid-template-columns: repeat(3, 1fr); /* 3 peças por linha */
+    .game-board {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 10px;
-      justify-items: center;
+      width: 80vw;
+      max-width: 1000px;
     }
-
-    .draggable {
-      width: 100px;
-      height: 100px;
-      background-image: url('quebra cabeça 2.png');
-      background-size: 300px 300px;
-      border: 1px solid #aaa;
-      touch-action: manipulation;
+    .col {
+      flex: 0 0 30%;
     }
-
-    .btn-restart {
-      margin-top: 20px;
-    }
-
     .menu {
       position: fixed;
       top: 20px;
@@ -88,9 +66,7 @@
       color: white;
       padding: 20px;
       transition: right 0.3s ease;
-      z-index: 999;
     }
-
     .menu a {
       color: white;
       text-decoration: none;
@@ -99,11 +75,9 @@
       font-size: 18px;
       border-bottom: 1px solid #444;
     }
-
     .menu a:hover {
       background-color: #444;
     }
-
     .hamburger {
       position: fixed;
       top: 1px;
@@ -116,115 +90,162 @@
       z-index: 1000;
       padding: 10px;
     }
-
     .hamburger:focus {
       outline: none;
     }
-
     .menu.open {
       right: 0;
     }
+    @media (max-width: 768px) {
+      .game-board {
+        width: 90vw;
+      }
+    }
   </style>
 </head>
-<body>
 
+<body>
   <button class="hamburger" id="hamburgerBtn">&#9776;</button>
   <div class="menu" id="menu">
-    <a href="#">Voltar para seleção de jogos</a>
+    <a href="select.html">Início</a>
     <a href="#">Sobre</a>
   </div>
-
-  <div class="puzzle-container" id="puzzleContainer">
-    <div class="puzzle-board" id="puzzleBoard"></div>
+  
+  <div class="container">
+    <div class="row row-cols-3 g-3 game-board" id="gameBoard"></div>
   </div>
 
-  <!-- Peças embaralhadas abaixo -->
-  <div class="tiles-container" id="tilesContainer"></div>
-
-  <button class="btn btn-warning btn-restart" onclick="startPuzzle()">Reiniciar</button>
-
   <script>
-    const board = document.getElementById('puzzleBoard');
-    const tilesContainer = document.getElementById('tilesContainer');
-    const puzzleContainer = document.getElementById('puzzleContainer');
-    const size = 3;
-    const tileSize = 100;
+    const images = [
+      "Cacá.png",
+      "Capitu.png",
+      "Patoca.png",
+      "Noar.png",
+      "Sapoti.png"
+    ];
+    let cards = [];
+    let firstCard = null;
+    let secondCard = null;
+    let canClick = false;
+    let matches = 0;
+    let currentPlayer = 1;
+    let scores = { 1: 0, 2: 0 };
 
-    function createDropZones() {
-      board.innerHTML = '';
-      for (let i = 0; i < size * size; i++) {
-        const dropZone = document.createElement('div');
-        dropZone.classList.add('tile');
-        dropZone.dataset.index = i;
-        dropZone.ondragover = (e) => e.preventDefault();
-        dropZone.ondrop = handleDrop;
-        board.appendChild(dropZone);
-      }
-    }
+    const gameBoard = document.getElementById("gameBoard");
 
-    function createDraggableTiles() {
-      tilesContainer.innerHTML = '';
-      puzzleContainer.classList.remove('completed'); // Reset transparência
-
-      const tileIndices = Array.from({ length: size * size }, (_, i) => i).sort(() => Math.random() - 0.5);
-      tileIndices.forEach(index => {
-        const row = Math.floor(index / size);
-        const col = index % size;
-
-        const tile = document.createElement('div');
-        tile.classList.add('draggable');
-        tile.draggable = true;
-        tile.dataset.index = index;
-        tile.style.backgroundPosition = `-${col * tileSize}px -${row * tileSize}px`;
-
-        tile.ondragstart = (e) => {
-          e.dataTransfer.setData("text/plain", index);
-        };
-
-        tilesContainer.appendChild(tile);
+    function initGame() {
+      cards = [...images, ...images].sort(() => 0.5 - Math.random());
+      gameBoard.innerHTML = "";
+      cards.forEach((img, index) => {
+        const col = document.createElement("div");
+        col.className = "col";
+        const card = document.createElement("div");
+        card.className = "card hidden";
+        card.dataset.index = index;
+        card.dataset.value = img;
+        card.addEventListener("click", () => revealCard(card));
+        col.appendChild(card);
+        gameBoard.appendChild(col);
       });
+      firstCard = null;
+      secondCard = null;
+      matches = 0;
+      scores = { 1: 0, 2: 0 };
     }
 
-    function handleDrop(e) {
-      const draggedIndex = e.dataTransfer.getData("text/plain");
-      const draggedTile = document.querySelector(`.draggable[data-index='${draggedIndex}']`);
-      const targetTile = e.target;
-
-      if (draggedTile && !targetTile.hasChildNodes()) {
-        targetTile.appendChild(draggedTile);
-        checkVictory();
-      }
+    function startGame() {
+      const cardsEl = document.querySelectorAll(".card");
+      cardsEl.forEach(card => {
+        const img = document.createElement("img");
+        img.src = card.dataset.value;
+        card.innerHTML = "";
+        card.appendChild(img);
+        card.classList.remove("hidden");
+      });
+      canClick = false;
+      setTimeout(() => {
+        cardsEl.forEach(card => {
+          card.innerHTML = "";
+          card.classList.add("hidden");
+        });
+        canClick = true;
+      }, 3000);
     }
 
-    function checkVictory() {
-      const allZones = document.querySelectorAll('.puzzle-board .tile');
+    function revealCard(card) {
+      if (!canClick || card.classList.contains("matched")) return;
+      
+      const img = document.createElement("img");
+      img.src = card.dataset.value;
 
-      for (let i = 0; i < allZones.length; i++) {
-        const piece = allZones[i].firstChild;
-        if (!piece || piece.dataset.index != i) {
-          return; // Ainda não venceu
+      img.onerror = () => {
+        console.error("Erro ao carregar a imagem:", img.src);
+        img.alt = "Imagem não encontrada";
+        img.style.background = "red";
+        img.style.color = "white";
+      };
+
+      card.innerHTML = "";
+      card.appendChild(img);
+      card.classList.remove("hidden");
+
+      if (!firstCard) {
+        firstCard = card;
+      } else {
+        secondCard = card;
+        canClick = false;
+        if (firstCard.dataset.value === secondCard.dataset.value) {
+          firstCard.classList.add("matched");
+          secondCard.classList.add("matched");
+          scores[currentPlayer]++;
+          matches++;
+          resetTurn();
+          if (matches === images.length) endGame();
+        } else {
+          setTimeout(() => {
+            firstCard.innerHTML = "";
+            secondCard.innerHTML = "";
+            firstCard.classList.add("hidden");
+            secondCard.classList.add("hidden");
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            resetTurn();
+          }, 1000);
         }
       }
-
-      // Se todas as peças estão nos lugares certos
-      puzzleContainer.classList.add('completed');
-      alert("Parabéns! Você completou o quebra-cabeça!");
     }
 
-    function startPuzzle() {
-      createDropZones();
-      createDraggableTiles();
+    function resetTurn() {
+      firstCard = null;
+      secondCard = null;
+      canClick = true;
     }
 
-    // Menu lateral toggle
-    const hamburger = document.getElementById('hamburgerBtn');
-    const menu = document.getElementById('menu');
-    hamburger.addEventListener('click', () => {
-      menu.classList.toggle('open');
+    function endGame() {
+      canClick = false;
+      const vencedor = scores[1] > scores[2] ? "Jogador 1" : scores[2] > scores[1] ? "Jogador 2" : "Empate";
+      alert(`Fim de jogo! Vencedor: ${vencedor}`);
+    }
+
+    // Inicialização
+    initGame();
+    startGame();
+
+    // Menu de hambúrguer
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    const menu = document.getElementById("menu");
+
+    hamburgerBtn.addEventListener("click", () => {
+      menu.classList.toggle("open");
     });
+  </script>
 
-    // Inicializa o jogo
-    window.onload = startPuzzle;
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log("✅ Service Worker registrado"))
+        .catch(err => console.log("Erro ao registrar o SW", err));
+    }
   </script>
 </body>
+
 </html>
