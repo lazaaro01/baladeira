@@ -96,6 +96,18 @@
     .menu.open {
       right: 0;
     }
+
+    /* Estilo para o cronômetro */
+    #timer {
+      position: fixed;
+      top: 3px;
+      left: 2px;
+      font-size: 2rem;
+      color: white;
+      padding: 10px 2px;
+      border-radius: 5px;
+    }
+
     @media (max-width: 768px) {
       .game-board {
         width: 90vw;
@@ -110,6 +122,9 @@
     <a href="select.html">Voltar para seleção de jogos</a>
     <a href="#">Sobre</a>
   </div>
+  
+  <!-- Cronômetro -->
+  <div id="timer">30s</div>
   
   <div class="container">
     <div class="row row-cols-3 g-3 game-board" id="gameBoard"></div>
@@ -130,8 +145,10 @@
     let matches = 0;
     let currentPlayer = 1;
     let scores = { 1: 0, 2: 0 };
+    let timeLeft = 30;  // Tempo inicial de 30 segundos
 
     const gameBoard = document.getElementById("gameBoard");
+    const timerElement = document.getElementById("timer");
 
     function initGame() {
       cards = [...images, ...images].sort(() => 0.5 - Math.random());
@@ -200,7 +217,6 @@
           scores[currentPlayer]++;
           matches++;
           resetTurn();
-          if (matches === images.length) endGame();
         } else {
           setTimeout(() => {
             firstCard.innerHTML = "";
@@ -220,11 +236,19 @@
       canClick = true;
     }
 
-    function endGame() {
-      canClick = false;
-      const vencedor = scores[1] > scores[2] ? "Jogador 1" : scores[2] > scores[1] ? "Jogador 2" : "Empate";
-      alert(`Fim de jogo! Vencedor: ${vencedor}`);
+    // Função para atualizar o cronômetro
+    function updateTimer() {
+      if (timeLeft > 0) {
+        timeLeft--;
+        timerElement.textContent = `${timeLeft}s`;
+      } else {
+        clearInterval(timerInterval);
+        alert("Tempo esgotado!");
+      }
     }
+
+    // Iniciar o cronômetro
+    const timerInterval = setInterval(updateTimer, 1000);
 
     // Inicialização
     initGame();
