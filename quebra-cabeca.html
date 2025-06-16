@@ -24,7 +24,7 @@
       position: relative;
       width: 300px;
       height: 300px;
-      margin: 150px auto; 
+      margin: 150px auto; /* Ajuste de margem para mover o quebra-cabeça para baixo */
       border: 2px solid #ccc;
       background-image: url('quebra cabeça 2.png');
       background-size: cover;
@@ -56,10 +56,11 @@
       touch-action: manipulation;
     }
 
+    /* Ajustes para as peças */
     .tiles-container {
-      margin-top: 20px; 
+      margin-top: 20px; /* Ajustei a margem para mover as peças para cima */
       display: grid;
-      grid-template-columns: repeat(3, 1fr); 
+      grid-template-columns: repeat(3, 1fr); /* 3 peças por linha */
       gap: 10px;
       justify-items: center;
     }
@@ -71,13 +72,6 @@
       background-size: 300px 300px;
       border: 1px solid #aaa;
       touch-action: manipulation;
-      transition: border-color 0.3s ease;
-    }
-
-    /* Adiciona a borda verde quando a peça é colocada corretamente */
-    .draggable.correct {
-      border-color: green !important; /* Borda verde */
-      pointer-events: none; /* Impede mover a peça após o encaixe */
     }
 
     .btn-restart {
@@ -136,7 +130,7 @@
 
   <button class="hamburger" id="hamburgerBtn">&#9776;</button>
   <div class="menu" id="menu">
-    <a href="select.html">Voltar para seleção de jogos</a>
+    <a href="#">Voltar para seleção de jogos</a>
     <a href="#">Sobre</a>
   </div>
 
@@ -144,6 +138,7 @@
     <div class="puzzle-board" id="puzzleBoard"></div>
   </div>
 
+  <!-- Peças embaralhadas abaixo -->
   <div class="tiles-container" id="tilesContainer"></div>
 
   <button class="btn btn-warning btn-restart" onclick="startPuzzle()">Reiniciar</button>
@@ -169,7 +164,7 @@
 
     function createDraggableTiles() {
       tilesContainer.innerHTML = '';
-      puzzleContainer.classList.remove('completed'); 
+      puzzleContainer.classList.remove('completed'); // Reset transparência
 
       const tileIndices = Array.from({ length: size * size }, (_, i) => i).sort(() => Math.random() - 0.5);
       tileIndices.forEach(index => {
@@ -197,12 +192,7 @@
 
       if (draggedTile && !targetTile.hasChildNodes()) {
         targetTile.appendChild(draggedTile);
-
-        // Verifica se a peça foi colocada corretamente
-        if (targetTile.dataset.index == draggedTile.dataset.index) {
-          draggedTile.classList.add('correct'); // Marca a peça como correta
-          checkVictory();
-        }
+        checkVictory();
       }
     }
 
@@ -212,10 +202,11 @@
       for (let i = 0; i < allZones.length; i++) {
         const piece = allZones[i].firstChild;
         if (!piece || piece.dataset.index != i) {
-          return; 
+          return; // Ainda não venceu
         }
       }
 
+      // Se todas as peças estão nos lugares certos
       puzzleContainer.classList.add('completed');
       alert("Parabéns! Você completou o quebra-cabeça!");
     }
@@ -225,12 +216,14 @@
       createDraggableTiles();
     }
 
+    // Menu lateral toggle
     const hamburger = document.getElementById('hamburgerBtn');
     const menu = document.getElementById('menu');
     hamburger.addEventListener('click', () => {
       menu.classList.toggle('open');
     });
 
+    // Inicializa o jogo
     window.onload = startPuzzle;
   </script>
 </body>
