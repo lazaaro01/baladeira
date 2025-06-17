@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Capi Valley</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: url('selecao.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Roboto', sans-serif;
+      color: #ffffff;
+      padding-top: 60px; /* Ajustado para diminuir o espaço superior */
+      text-align: center;
+    }
+
+    h1 {
+      color: #ffffff;
+      font-size: 20px;
+      margin-top: 100px; /* Ajustado para ficar mais perto da imagem */
+      margin-bottom: 20px;
+    }
+
+    #timer {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      font-size: 1.5rem;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .quiz-container {
+      border-radius: 15px;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      margin: 40px auto;
+    }
+
+    .sapoti-img {
+      width: 220px; /* Reduzido a largura */
+      height: 250px; /* Ajustada a altura */
+      margin-bottom: 20px;
+      border-radius: 15px;
+    }
+
+    .slots {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .slot {
+      width: 40px; /* Aumentado para melhorar a interação */
+      height: 50px; /* Aumentado para dar mais espaço */
+      font-size: 30px; /* Aumentado o tamanho da fonte */
+      font-weight: bold;
+      border-bottom: 2px solid #ffffff;
+      text-align: center;
+      line-height: 50px; /* Ajustado o alinhamento vertical */
+    }
+
+    .letters {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px; /* Aumentado o espaçamento */
+    }
+
+    .letter {
+      width: 50px; /* Aumentado o tamanho das letras */
+      height: 50px; /* Aumentado o tamanho das letras */
+      font-size: 28px; /* Aumentado o tamanho da fonte */
+      color: #ffffff;
+      border-radius: 8px;
+      line-height: 50px; /* Ajustado para o alinhamento central */
+      cursor: pointer;
+      user-select: none;
+      font-weight: bold;
+    }
+
+    .letter.dragging {
+      opacity: 0.5;
+    }
+
+    .message {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    .btn-restart {
+      margin-top: 20px;
+    }
+
+    /* MENU */
+    .menu {
+      position: fixed;
+      top: 20px;
+      right: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: #333;
+      color: white;
+      padding: 20px;
+      transition: right 0.3s ease;
+      z-index: 999;
+    }
+
+    .menu a {
+      color: white;
+      text-decoration: none;
+      display: block;
+      padding: 10px 0;
+      font-size: 18px;
+      border-bottom: 1px solid #444;
+    }
+
+    .menu a:hover {
+      background-color: #444;
+    }
+
+    .hamburger {
+      position: fixed;
+      top: 1px;
+      right: 3px;
+      background: none;
+      border: none;
+      color: #f8f9fa;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 1000;
+      padding: 10px;
+    }
+
+    .menu.open {
+      right: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="hamburger" id="hamburgerBtn">&#9776;</button>
+  <div class="menu" id="menu">
+    <a href="select.html">Voltar para seleção de jogos</a>
+    <a href="#">Sobre</a>
+  </div>
+
+  <!-- Título do quiz -->
+  <h1>Qual o nome do personagem?</h1>
+
+  <!-- Temporizador -->
+  <div id="timer">30</div>
+
+  <div class="quiz-container">
+    <img src="qual nome do personagem.png" alt="Sapoti" class="sapoti-img" />
+
+    <div class="slots" id="slots"></div>
+    <div class="letters" id="letters"></div>
+
+    <div class="message" id="message"></div>
+    <button class="btn btn-warning btn-restart" onclick="initGame()">Reiniciar</button>
+  </div>
+
+  <script>
+    const correctName = ['S', 'A', 'P', 'O', 'T', 'I'];
+    let draggedLetter = null;
+    let timer;
+    let timeLeft = 30;
+
+    const slotsContainer = document.getElementById('slots');
+    const lettersContainer = document.getElementById('letters');
+    const message = document.getElementById('message');
+    const timerElement = document.getElementById('timer');
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function initGame() {
+      slotsContainer.innerHTML = '';
+      lettersContainer.innerHTML = '';
+      message.innerText = '';
+      timeLeft = 30;
+      timerElement.innerText = timeLeft;
+
+      // Criar slots vazios com underline
+      for (let i = 0; i < correctName.length; i++) {
+        const slot = document.createElement('div');
+        slot.classList.add('slot');
+        slot.dataset.index = i;
+        slot.ondragover = e => e.preventDefault();
+        slot.ondrop = handleDrop;
+        slotsContainer.appendChild(slot);
+      }
+
+      // Letras embaralhadas
+      const shuffled = shuffle([...correctName]);
+      for (let letter of shuffled) {
+        const letterEl = document.createElement('div');
+        letterEl.classList.add('letter');
+        letterEl.innerText = letter;
+        letterEl.setAttribute('draggable', 'true');
+        letterEl.ondragstart = handleDragStart;
+        letterEl.ondragend = handleDragEnd;
+        lettersContainer.appendChild(letterEl);
+      }
+
+      // Iniciar o cronômetro
+      startTimer();
+    }
+
+    function handleDragStart(e) {
+      draggedLetter = e.target;
+      setTimeout(() => e.target.classList.add('dragging'), 0);
+    }
+
+    function handleDragEnd(e) {
+      e.target.classList.remove('dragging');
+    }
+
+    function handleDrop(e) {
+      if (!draggedLetter) return;
+      if (e.target.innerText === '') {
+        e.target.innerText = draggedLetter.innerText;
+        draggedLetter.remove();
+        checkCompletion();
+      }
+    }
+
+    function checkCompletion() {
+      const slots = Array.from(document.querySelectorAll('.slot'));
+      const result = slots.map(s => s.innerText).join('');
+      if (result.length === correctName.length) {
+        if (result === correctName.join('')) {
+          message.innerText = "Parabéns! Você montou SAPOTI corretamente! 🎉";
+          message.style.color = "green";
+        } else {
+          message.innerText = "Ops! Essa não é a ordem certa. Tente de novo!";
+          message.style.color = "red";
+        }
+      }
+    }
+
+    // Inicia o cronômetro
+    function startTimer() {
+      timer = setInterval(() => {
+        if (timeLeft > 0) {
+          timeLeft--;
+          timerElement.innerText = timeLeft;
+        } else {
+          clearInterval(timer);
+          message.innerText = "Tempo esgotado! Tente novamente!";
+          message.style.color = "red";
+        }
+      }, 1000);
+    }
+
+    // Menu
+    document.getElementById('hamburgerBtn').addEventListener('click', () => {
+      document.getElementById('menu').classList.toggle('open');
+    });
+
+    window.onload = initGame;
+  </script>
+</body>
+</html>
