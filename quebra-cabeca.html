@@ -13,6 +13,7 @@
       text-align: center;
       padding: 20px;
       user-select: none;
+      transition: background-image 0.5s ease-in-out;
     }
 
     h1 {
@@ -24,7 +25,7 @@
       position: relative;
       width: 300px;
       height: 300px;
-      margin: 150px auto; /* Ajuste de margem para mover o quebra-cabeça para baixo */
+      margin: 150px auto;
       border: 2px solid #ccc;
       background-image: url('quebra cabeça 2.png');
       background-size: cover;
@@ -56,11 +57,10 @@
       touch-action: manipulation;
     }
 
-    /* Ajustes para as peças */
     .tiles-container {
-      margin-top: 20px; /* Ajustei a margem para mover as peças para cima */
+      margin-top: 20px;
       display: grid;
-      grid-template-columns: repeat(3, 1fr); /* 3 peças por linha */
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
       justify-items: center;
     }
@@ -72,6 +72,12 @@
       background-size: 300px 300px;
       border: 1px solid #aaa;
       touch-action: manipulation;
+      transition: border-color 0.3s ease;
+    }
+
+    .draggable.correct {
+      border-color: green !important;
+      pointer-events: none;
     }
 
     .btn-restart {
@@ -107,7 +113,7 @@
     .hamburger {
       position: fixed;
       top: 1px;
-      right: 3px;
+      right: 20px;
       background: none;
       border: none;
       color: #f8f9fa;
@@ -124,6 +130,30 @@
     .menu.open {
       right: 0;
     }
+
+    /* Timer */
+    #timer {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      color: white;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    /* Ajustando a imagem de sucesso ou falha para cobrir toda a tela */
+    #successImage, #failImage {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      z-index: 999;
+    }
   </style>
 </head>
 <body>
@@ -138,8 +168,14 @@
     <div class="puzzle-board" id="puzzleBoard"></div>
   </div>
 
-  <!-- Peças embaralhadas abaixo -->
   <div class="tiles-container" id="tilesContainer"></div>
+
+  <!-- Timer -->
+  <div id="timer">30</div>
+
+  <!-- Imagens de sucesso e falha em fundo inteiro -->
+  <div id="successImage" style="background-image: url('sucesso.jpg');"></div>
+  <div id="failImage" style="background-image: url('falha.jpg');"></div>
 
   <button class="btn btn-warning btn-restart" onclick="startPuzzle()">Reiniciar</button>
 
@@ -147,8 +183,13 @@
     const board = document.getElementById('puzzleBoard');
     const tilesContainer = document.getElementById('tilesContainer');
     const puzzleContainer = document.getElementById('puzzleContainer');
+    const timerElement = document.getElementById('timer');
+    const successImage = document.getElementById('successImage');
+    const failImage = document.getElementById('failImage');
     const size = 3;
     const tileSize = 100;
+    let timeLeft = 30;
+    let timerInterval;
 
     function createDropZones() {
       board.innerHTML = '';
@@ -164,7 +205,7 @@
 
     function createDraggableTiles() {
       tilesContainer.innerHTML = '';
-      puzzleContainer.classList.remove('completed'); // Reset transparência
+      puzzleContainer.classList.remove('completed');
 
       const tileIndices = Array.from({ length: size * size }, (_, i) => i).sort(() => Math.random() - 0.5);
       tileIndices.forEach(index => {
@@ -192,38 +233,58 @@
 
       if (draggedTile && !targetTile.hasChildNodes()) {
         targetTile.appendChild(draggedTile);
-        checkVictory();
+
+        // Verifica se a peça foi colocada corretamente
+        if (targetTile.dataset.index == draggedTile.dataset.index) {
+          draggedTile.classList.add('correct');
+          checkVictory();
+        }
       }
     }
 
     function checkVictory() {
       const allZones = document.querySelectorAll('.puzzle-board .tile');
-
       for (let i = 0; i < allZones.length; i++) {
         const piece = allZones[i].firstChild;
         if (!piece || piece.dataset.index != i) {
-          return; // Ainda não venceu
+          return;
         }
       }
-
-      // Se todas as peças estão nos lugares certos
+      clearInterval(timerInterval);
       puzzleContainer.classList.add('completed');
-      alert("Parabéns! Você completou o quebra-cabeça!");
+      successImage.style.display = 'block';
     }
 
     function startPuzzle() {
       createDropZones();
       createDraggableTiles();
+      startTimer();
+      successImage.style.display = 'none';
+      failImage.style.display = 'none';
     }
 
-    // Menu lateral toggle
+    function startTimer() {
+      timeLeft = 30;
+      timerElement.textContent = timeLeft;
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerElement.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          failImage.style.display = 'block';
+          puzzleContainer.classList.add('completed');
+        }
+      }, 1000);
+    }
+
     const hamburger = document.getElementById('hamburgerBtn');
     const menu = document.getElementById('menu');
     hamburger.addEventListener('click', () => {
       menu.classList.toggle('open');
     });
 
-    // Inicializa o jogo
     window.onload = startPuzzle;
   </script>
 </body>
