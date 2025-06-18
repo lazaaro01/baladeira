@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Seleção de Jogos</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
     body,html {
       font-family: 'Roboto', sans-serif;
@@ -19,14 +19,14 @@
     }
 
     .container {
-      padding-top: 50px;
+      padding-top: 60px;
       text-align: center;
       color: #fff;
     }
 
     .game-option {
       margin: 20px;
-      padding: 20px;
+      padding: 10px;
       background-color: #2a792e;
       border-radius: 20px;
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
@@ -36,9 +36,21 @@
       align-items: center;
       justify-content: center;
     }
+
+    .game-option img {
+      width: 70px; /* Aumentei o tamanho da imagem */
+      height: 70px; /* Aumentei o tamanho da imagem */
+      margin-right: 10px; /* Diminuí o espaço entre a imagem e o nome */
+    }
+
+    .game-name {
+      text-align: left;
+      flex-grow: 1; /* Para o nome ocupar o espaço restante */
+    }
+
     a {
-        text-decoration: none;
-        color: inherit;
+      text-decoration: none;
+      color: inherit;
     }
   </style>
 </head>
@@ -46,32 +58,30 @@
   <div class="container">
 
     <a href="memoria.html">
-        <div class="game-option d-flex align-items-center justify-content-center">
-        <img src="icons baladeira.png" alt="ícone QUEBRA-CABEÇA" style="width: 50px; height: 50px; margin-right: 15px;">
-        <span class="game-name d-flex align-items-center justify-content-center">JOGO DA MEMÓRIA</span>
+      <div class="game-option d-flex align-items-center justify-content-center">
+        <img src="memoria.png" alt="ícone QUEBRA-CABEÇA">
+        <span class="game-name">JOGO DA MEMÓRIA</span>
       </div>
     </a>
 
     <a href="#">
-        <div class="game-option d-flex align-items-center justify-content-center">
-        <img src="RESGATE DO CACÁ.png" alt="ícone QUEBRA-CABEÇA" style="width: 50px; height: 50px; margin-right: 15px;">
-        <span class="game-name d-flex align-items-center justify-content-center">RESGATE DO CACÁ</span>
+      <div class="game-option d-flex align-items-center justify-content-center">
+        <img src="RESGATE DO CACÁ.png" alt="ícone RESGATE DO CACÁ">
+        <span class="game-name">RESGATE DO CACÁ</span>
       </div>
-
     </a>
 
     <a href="quebra-cabeca.html">
       <div class="game-option d-flex align-items-center justify-content-center">
-        <img src="QUEBRA CABEÇA.png" alt="ícone QUEBRA-CABEÇA" style="width: 50px; height: 50px; margin-right: 15px;">
-        <span class="game-name d-flex align-items-center justify-content-center">QUEBRA-CABEÇA</span>
+        <img src="QUEBRA CABEÇA.png" alt="ícone QUEBRA-CABEÇA">
+        <span class="game-name">QUEBRA-CABEÇA</span>
       </div>
-
     </a>
 
     <a href="quiz.html">
-        <div class="game-option d-flex align-items-center justify-content-center">
-        <img src="QUIZ DO CAPI VALLEY.png" alt="ícone QUEBRA-CABEÇA" style="width: 50px; height: 50px; margin-right: 15px;">
-        <span class="game-name d-flex align-items-center justify-content-center">QUIZ CAPI VALLEY</span>
+      <div class="game-option d-flex align-items-center justify-content-center">
+        <img src="quiz.png" alt="ícone QUAL É A PALAVRA?">
+        <span class="game-name">QUAL É A PALAVRA?</span>
       </div>
     </a>
   </div>
