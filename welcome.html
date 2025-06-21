@@ -2,20 +2,22 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8b4513">
   <title>Bem-vindo ao Capi Valley</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body, html {
       height: 100%;
       margin: 0;
-      background: url('capa de carregamento.Jpg') no-repeat center center fixed;
+      background: url('/img/capa\ de\ carregamento.Jpg') no-repeat center center fixed;
       background-size: cover;
     }
 
     .welcome-container {
       height: 100%;
-      display: flex;
+      display: flex; 
       justify-content: center;
       align-items: flex-end;
       padding-bottom: 140px;
@@ -37,7 +39,6 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: url('https://www.example.com/imagens/texture-tronco.jpg') center center no-repeat;
       background-size: cover;
       opacity: 0.1;
       z-index: 2;
@@ -82,6 +83,11 @@
         window.location.href = 'select.html';
       }, 1000);
     }
+       if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(reg => console.log("Service Worker registrado ✅"))
+      .catch(err => console.error("Erro ao registrar Service Worker ❌", err));
+  }
   </script>
 </body>
 </html>
