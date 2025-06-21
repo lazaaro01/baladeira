@@ -1,10 +1,15 @@
-const cacheName = 'memoria-cache-v1';
+const cacheName = 'capivalley-cache-v1';
 const assets = [
   './',
-  '/index.html',
+  '/welcome.html',
+  '/resgate.html',
+  '/select.html',
+  '/quiz.html',
+  '/quebra-cabeca.html',
+  '/memoria.html',
   '/manifest.json',
-  '/icon.png',
-  '/icon.png',
+  '/capa de carregamento.jpg',
+  '/capa de carregamento.jpg',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css'
 ];
 
