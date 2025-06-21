@@ -2,328 +2,440 @@
 <html lang="pt-br">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0d6efd">
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" sizes="192x192" href="icon.png">
-  <title>Jogo da Memória</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <style>
-    body {
-      background: url('basememoria.png') no-repeat center center fixed;
-      background-size: cover;
-      height: 100vh;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jogo da Memória</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: url('basememoria.png') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
 
-    .card {
-      width: 100%;
-      height: 70px;
-      background-color: transparent; /* Alterado para transparente para mostrar o card-inner */
-      border: 1px solid #ccc;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 2rem;
-      cursor: pointer;
-      user-select: none;
-      position: relative; /* Necessário para posicionar o card-inner */
-      perspective: 1000px; /* Adiciona perspectiva para o efeito 3D */
-    }
+        .card {
+            width: 100%;
+            height: 70px;
+            background-color: transparent;
+            /* Alterado para transparente para mostrar o card-inner */
+            border: 1px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            /* Necessário para posicionar o card-inner */
+            perspective: 1000px;
+            /* Adiciona perspectiva para o efeito 3D */
+        }
 
-    /* Estilos para o efeito de virar */
-    .card-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      text-align: center;
-      transition: transform 0.6s; /* Animação suave */
-      transform-style: preserve-3d; /* Garante que os filhos preservem a transformação 3D */
-    }
+        /* Estilos para o efeito de virar */
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            /* Animação suave */
+            transform-style: preserve-3d;
+            /* Garante que os filhos preservem a transformação 3D */
+        }
 
-    .card.flipped .card-inner {
-      transform: rotateY(180deg); /* Vira o card */
-    }
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+            /* Vira o card */
+        }
 
-    .card-front,
-    .card-back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      -webkit-backface-visibility: hidden; /* Esconde o lado de trás durante a rotação */
-      backface-visibility: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: inherit; /* Herda o border-radius do pai se houver */
-    }
+        .card-front,
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            /* Esconde o lado de trás durante a rotação */
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: inherit;
+            /* Herda o border-radius do pai se houver */
+        }
 
-    .card-front {
-      background: url('memoria.png') no-repeat center center;
-      background-color: #2a792e; /* Cor de fundo da capa */
-      background-size: 60px 60px;
-    }
+        .card-front {
+            background: url('memoria.png') no-repeat center center;
+            background-color: #2a792e;
+            /* Cor de fundo da capa */
+            background-size: 60px 60px;
+        }
 
-    .card-back {
-      background-color: #2a792e; /* Cor de fundo da imagem */
-      transform: rotateY(180deg); /* Inicialmente virado para trás */
-    }
+        .card-back {
+            background-color: #2a792e;
+            /* Cor de fundo da imagem */
+            transform: rotateY(180deg);
+            /* Inicialmente virado para trás */
+        }
 
-    .card-back img {
-      max-width: 100%;
-      max-height: 100%;
-    }
+        .card-back img {
+            max-width: 100%;
+            max-height: 100%;
+        }
 
-    .matched .card-inner {
-      background-color: #2a792e; /* Cor para cards combinados */
-      pointer-events: none; /* Desabilita cliques em cards combinados */
-    }
+        .matched .card-inner {
+            background-color: #2a792e;
+            /* Cor para cards combinados */
+            pointer-events: none;
+            /* Desabilita cliques em cards combinados */
+        }
 
-    .game-board {
-      display: flex;
-      flex-direction: wrap;
-      justify-content: center;
-      gap: 10px;
-      width: 80vw;
-      max-width: 1000px;
-    }
+        .game-board {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            width: 80vw;
+            max-width: 1000px;
+        }
 
-    .col {
-      flex: 0 0 30%;
-    }
+        .col {
+            flex: 0 0 30%;
+        }
 
-    .menu {
-      position: fixed;
-      top: 20px;
-      right: -250px;
-      width: 250px;
-      height: 100%;
-      background-color: #333;
-      color: white;
-      padding: 20px;
-      transition: right 0.3s ease;
-    }
+        .menu {
+            position: fixed;
+            top: 20px;
+            right: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            transition: right 0.3s ease;
+        }
 
-    .menu a {
-      color: white;
-      text-decoration: none;
-      display: block;
-      padding: 10px 0;
-      font-size: 18px;
-      border-bottom: 1px solid #444;
-    }
+        .menu a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px 0;
+            font-size: 18px;
+            border-bottom: 1px solid #444;
+        }
 
-    .menu a:hover {
-      background-color: #444;
-    }
+        .menu a:hover {
+            background-color: #444;
+        }
 
-    .hamburger {
-      position: fixed;
-      top: 1px;
-      right: 3px;
-      background: none;
-      border: none;
-      color: #f8f9fa;
-      font-size: 30px;
-      cursor: pointer;
-      z-index: 1000;
-      padding: 10px;
-    }
+        .hamburger {
+            position: fixed;
+            top: 1px;
+            right: 3px;
+            background: none;
+            border: none;
+            color: #f8f9fa;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 1000;
+            padding: 10px;
+        }
 
-    .hamburger:focus {
-      outline: none;
-    }
+        .hamburger:focus {
+            outline: none;
+        }
 
-    .menu.open {
-      right: 0;
-    }
+        .menu.open {
+            right: 0;
+        }
 
-    /* Estilo para o cronômetro */
-    #timer {
-      position: fixed;
-      top: 3px;
-      left: 2px;
-      font-size: 2rem;
-      color: white;
-      padding: 10px 2px;
-      border-radius: 5px;
-    }
+        /* Estilo para o cronômetro */
+        #timer {
+            position: fixed;
+            top: 3px;
+            left: 2px;
+            font-size: 2rem;
+            color: white;
+            padding: 10px 2px;
+            border-radius: 5px;
+        }
 
-    @media (max-width: 768px) {
-      .game-board {
-        width: 90vw;
-      }
-    }
-  </style>
+        /* Estilos para as sobreposições de sucesso e derrota */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .overlay img {
+            max-width: 80%;
+            max-height: 80%;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .overlay p {
+            color: white;
+            font-size: 2.5rem;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .overlay button {
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            background: linear-gradient(145deg, #8b4513, #6a2c0e);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .overlay button:hover {
+            background: linear-gradient(145deg, #8b4513, #6a2c0e);
+        }
+
+        @media (max-width: 768px) {
+            .game-board {
+                width: 90vw;
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <button class="hamburger" id="hamburgerBtn">&#9776;</button>
-  <div class="menu" id="menu">
-    <a href="select.html">Voltar para seleção de jogos</a>
-    <a href="#">Sobre</a>
-  </div>
+    <button class="hamburger" id="hamburgerBtn">&#9776;</button>
+    <div class="menu" id="menu">
+        <a href="select.html">Voltar para seleção de jogos</a>
+        <a href="#">Sobre</a>
+    </div>
 
-  <div id="timer">30s</div>
+    <div id="timer">60s</div>
 
-  <div class="container">
-    <div class="row row-cols-3 g-3 game-board" id="gameBoard"></div>
-  </div>
+    <div class="container">
+        <div class="row row-cols-3 g-3 game-board" id="gameBoard"></div>
+    </div>
 
-  <script>
-    const images = [
-      "Cacá.png",
-      "Capitu.png",
-      "Patoca.png",
-      "Noar.png",
-      "Sapoti.png",
-      "Sapoti.png",
-    ];
-    let cards = [];
-    let firstCard = null;
-    let secondCard = null;
-    let canClick = false;
-    let matches = 0;
-    let currentPlayer = 1;
-    let scores = { 1: 0, 2: 0 };
-    let timeLeft = 30; // Tempo inicial de 30 segundos
+    <div id="successOverlay" class="overlay">
+        <img src="sucesso.jpg" alt="Parabéns, você ganhou!">
+        <button id="playAgainSuccess">Jogar Novamente</button>
+    </div>
 
-    const gameBoard = document.getElementById("gameBoard");
-    const timerElement = document.getElementById("timer");
+    <div id="defeatOverlay" class="overlay">
+        <img src="falha.jpg" alt="Tempo esgotado, tente novamente!">
+        <button id="playAgainDefeat">Jogar Novamente</button>
+    </div>
 
-    function initGame() {
-      cards = [...images, ...images].sort(() => 0.5 - Math.random());
-      gameBoard.innerHTML = "";
-      cards.forEach((img, index) => {
-        const col = document.createElement("div");
-        col.className = "col";
+    <script>
+        const images = [
+            "memoria1.jpg",
+            "memoria2.jpg",
+            "memoria3.jpg",
+            "memoria4.jpg",
+            "memoria5.jpg",
+            "memoria6.jpg",
+        ];
+        let cards = [];
+        let firstCard = null;
+        let secondCard = null;
+        let canClick = false;
+        let matches = 0;
+        let currentPlayer = 1; // Você parece ter um jogo de um jogador, então currentPlayer pode ser simplificado
+        let scores = { 1: 0 }; // Ajustado para um jogador
+        let timeLeft = 60; // Tempo inicial do jogo
+        let timerInterval; // Variável para armazenar o intervalo do cronômetro
 
-        const card = document.createElement("div");
-        card.className = "card"; // Remove 'hidden' aqui, pois será controlado pelo 'flipped'
-        card.dataset.index = index;
-        card.dataset.value = img;
+        const gameBoard = document.getElementById("gameBoard");
+        const timerElement = document.getElementById("timer");
+        const successOverlay = document.getElementById("successOverlay");
+        const defeatOverlay = document.getElementById("defeatOverlay");
+        const playAgainSuccessBtn = document.getElementById("playAgainSuccess");
+        const playAgainDefeatBtn = document.getElementById("playAgainDefeat");
 
-        const cardInner = document.createElement("div");
-        cardInner.className = "card-inner";
+        function initGame() {
+            cards = [...images, ...images].sort(() => 0.5 - Math.random());
+            gameBoard.innerHTML = "";
+            cards.forEach((img, index) => {
+                const col = document.createElement("div");
+                col.className = "col";
 
-        const cardFront = document.createElement("div");
-        cardFront.className = "card-front";
+                const card = document.createElement("div");
+                card.className = "card";
+                card.dataset.index = index;
+                card.dataset.value = img;
 
-        const cardBack = document.createElement("div");
-        cardBack.className = "card-back";
-        const imageElement = document.createElement("img");
-        imageElement.src = img;
-        imageElement.onerror = () => {
-          console.error("Erro ao carregar a imagem:", imageElement.src);
-          imageElement.alt = "Imagem não encontrada";
-          imageElement.style.background = "red";
-          imageElement.style.color = "white";
-        };
-        cardBack.appendChild(imageElement);
+                const cardInner = document.createElement("div");
+                cardInner.className = "card-inner";
 
-        cardInner.appendChild(cardFront);
-        cardInner.appendChild(cardBack);
-        card.appendChild(cardInner);
+                const cardFront = document.createElement("div");
+                cardFront.className = "card-front";
 
-        card.addEventListener("click", () => revealCard(card));
-        col.appendChild(card);
-        gameBoard.appendChild(col);
-      });
-      firstCard = null;
-      secondCard = null;
-      matches = 0;
-      scores = { 1: 0, 2: 0 };
-    }
+                const cardBack = document.createElement("div");
+                cardBack.className = "card-back";
+                const imageElement = document.createElement("img");
+                imageElement.src = img;
+                imageElement.onerror = () => {
+                    console.error("Erro ao carregar a imagem:", imageElement.src);
+                    imageElement.alt = "Imagem não encontrada";
+                    imageElement.style.background = "red";
+                    imageElement.style.color = "white";
+                };
+                cardBack.appendChild(imageElement);
 
-    function startGame() {
-      const cardsEl = document.querySelectorAll(".card");
-      // Vira todos os cards para mostrar as imagens
-      cardsEl.forEach(card => {
-        card.classList.add("flipped");
-      });
-      canClick = false;
-      // Espera 3 segundos e vira os cards de volta
-      setTimeout(() => {
-        cardsEl.forEach(card => {
-          card.classList.remove("flipped");
-        });
-        canClick = true;
-      }, 3000);
-    }
+                cardInner.appendChild(cardFront);
+                cardInner.appendChild(cardBack);
+                card.appendChild(cardInner);
 
-    function revealCard(card) {
-      if (!canClick || card.classList.contains("matched") || card.classList.contains("flipped")) return;
-
-      card.classList.add("flipped"); // Vira o card
-
-      if (!firstCard) {
-        firstCard = card;
-      } else {
-        secondCard = card;
-        canClick = false;
-        if (firstCard.dataset.value === secondCard.dataset.value) {
-          firstCard.classList.add("matched");
-          secondCard.classList.add("matched");
-          scores[currentPlayer]++;
-          matches++;
-          resetTurn();
-        } else {
-          setTimeout(() => {
-            firstCard.classList.remove("flipped"); // Vira de volta
-            secondCard.classList.remove("flipped"); // Vira de volta
-            currentPlayer = currentPlayer === 1 ? 2 : 1;
-            resetTurn();
-          }, 1000);
+                card.addEventListener("click", () => revealCard(card));
+                col.appendChild(card);
+                gameBoard.appendChild(col);
+            });
+            firstCard = null;
+            secondCard = null;
+            matches = 0;
+            scores = { 1: 0 }; // Reinicia a pontuação
+            timeLeft = 60; // Reinicia o tempo
+            timerElement.textContent = `${timeLeft}s`; // Atualiza o display do cronômetro
+            hideOverlays(); // Garante que as sobreposições estejam ocultas
+            canClick = false; // Desabilita cliques até o início do jogo
         }
-      }
-    }
 
-    function resetTurn() {
-      firstCard = null;
-      secondCard = null;
-      canClick = true;
-    }
+        function startGame() {
+            const cardsEl = document.querySelectorAll(".card");
+            // Vira todos os cards para mostrar as imagens por 3 segundos
+            cardsEl.forEach(card => {
+                card.classList.add("flipped");
+            });
 
-    // Função para atualizar o cronômetro
-    function updateTimer() {
-      if (timeLeft > 0) {
-        timeLeft--;
-        timerElement.textContent = `${timeLeft}s`;
-      } else {
-        clearInterval(timerInterval);
-        alert("Tempo esgotado!");
-      }
-    }
+            setTimeout(() => {
+                cardsEl.forEach(card => {
+                    card.classList.remove("flipped");
+                });
+                canClick = true; // Habilita cliques após a pré-visualização
+                startTimer(); // Inicia o cronômetro
+            }, 3000);
+        }
 
-    // Iniciar o cronômetro
-    const timerInterval = setInterval(updateTimer, 1000);
+        function revealCard(card) {
+            if (!canClick || card.classList.contains("matched") || card.classList.contains("flipped")) return;
 
-    // Inicialização
-    initGame();
-    startGame();
+            card.classList.add("flipped"); // Vira o card
 
-    // Menu de hambúrguer
-    const hamburgerBtn = document.getElementById("hamburgerBtn");
-    const menu = document.getElementById("menu");
+            if (!firstCard) {
+                firstCard = card;
+            } else {
+                secondCard = card;
+                canClick = false; // Desabilita cliques enquanto as cartas são comparadas
 
-    hamburgerBtn.addEventListener("click", () => {
-      menu.classList.toggle("open");
-    });
-  </script>
+                if (firstCard.dataset.value === secondCard.dataset.value) {
+                    firstCard.classList.add("matched");
+                    secondCard.classList.add("matched");
+                    scores[1]++; // Assume um único jogador
+                    matches++;
+                    checkWin(); // Verifica se o jogo terminou
+                    resetTurn();
+                } else {
+                    setTimeout(() => {
+                        firstCard.classList.remove("flipped"); // Vira de volta
+                        secondCard.classList.remove("flipped"); // Vira de volta
+                        resetTurn();
+                    }, 1000);
+                }
+            }
+        }
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(() => console.log("✅ Service Worker registrado"))
-        .catch(err => console.log("Erro ao registrar o SW", err));
-    }
-  </script>
+        function resetTurn() {
+            firstCard = null;
+            secondCard = null;
+            canClick = true; // Reabilita cliques
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval); // Garante que não há múltiplos cronômetros
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            if (timeLeft > 0) {
+                timeLeft--;
+                timerElement.textContent = `${timeLeft}s`;
+            } else {
+                clearInterval(timerInterval);
+                endGame(false); // Tempo esgotado, derrota
+            }
+        }
+
+        function checkWin() {
+            if (matches === images.length) { // Se o número de pares combinados for igual ao número de imagens únicas
+                clearInterval(timerInterval); // Para o cronômetro
+                endGame(true); // Jogo ganho
+            }
+        }
+
+        function endGame(win) {
+            canClick = false; // Desabilita cliques
+            if (win) {
+                successOverlay.classList.add("show");
+            } else {
+                defeatOverlay.classList.add("show");
+            }
+        }
+
+        function hideOverlays() {
+            successOverlay.classList.remove("show");
+            defeatOverlay.classList.remove("show");
+        }
+
+        // Event listeners para os botões "Jogar Novamente"
+        playAgainSuccessBtn.addEventListener("click", () => {
+            window.location.href = 'select.html'; // Redireciona para a página select.html
+        });
+
+        playAgainDefeatBtn.addEventListener("click", () => {
+            window.location.href = 'select.html'; // Redireciona para a página select.html
+        });
+
+        // Inicialização
+        initGame();
+        startGame();
+
+        // Menu de hambúrguer
+        const hamburgerBtn = document.getElementById("hamburgerBtn");
+        const menu = document.getElementById("menu");
+
+        hamburgerBtn.addEventListener("click", () => {
+            menu.classList.toggle("open");
+        });
+
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log("✅ Service Worker registrado"))
+                .catch(err => console.log("Erro ao registrar o SW", err));
+        }
+    </script>
 </body>
-
 </html>
