@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8b4513">
     <title>Quiz Capi Valley</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
@@ -384,6 +386,12 @@
         });
 
         window.onload = initGame; // Inicia o jogo ao carregar a página
+
+         if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(reg => console.log("Service Worker registrado ✅"))
+      .catch(err => console.error("Erro ao registrar Service Worker ❌", err));
+  }
     </script>
 </body>
 </html>
