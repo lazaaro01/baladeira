@@ -1,10 +1,16 @@
-const CACHE_NAME = "cacanicks-cache-v1";
+const CACHE_NAME = "capivalley-cache-v1";
 const urlsToCache = [
-    "/",
-    "/index.html",
-    "/manifest.json",
-    "/icon-192.png",
-    "/icon-512.png",
+   './',
+  '/welcome.html',
+  '/resgate.html',
+  '/select.html',
+  '/quiz.html',
+  '/quebra-cabeca.html',
+  '/memoria.html',
+  '/manifest.json',
+  '/capa de carregamento.jpg',
+  '/capa de carregamento.jpg',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css'
 ];
 
 self.addEventListener("install", (event) => {
