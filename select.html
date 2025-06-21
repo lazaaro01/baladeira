@@ -1,98 +1,397 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#8b4513">
-  <title>Seleção de Jogos</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <style>
-    body,html {
-      font-family: 'Roboto', sans-serif;
-      height: 100%;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: url('selecao.jpg') no-repeat center center fixed;
-      background-size: cover;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8b4513">
+    <title>Quiz Capi Valley</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+         body {
+            background: url('selecao.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Roboto', sans-serif;
+            color: #ffffff;
+            padding-top: 60px; /* Ajustado para diminuir o espaço superior */
+            text-align: center;
+        }
 
-    .container {
-      padding-top: 60px;
-      text-align: center;
-      color: #fff;
-    }
+        h1 {
+            color: #ffffff;
+            font-size: 20px;
+            margin-top: 100px; /* Ajustado para ficar mais perto da imagem */
+            margin-bottom: 20px;
+        }
 
-    .game-option {
-      margin: 20px;
-      padding: 10px;
-      background-color: #2a792e;
-      border-radius: 20px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-      width: 80%;
-      max-width: 400px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        #timer {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            font-size: 1.5rem;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
 
-    .game-option img {
-      width: 70px; /* Aumentei o tamanho da imagem */
-      height: 70px; /* Aumentei o tamanho da imagem */
-      margin-right: 10px; /* Diminuí o espaço entre a imagem e o nome */
-    }
+        .quiz-container {
+            border-radius: 15px;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            margin: 40px auto;
+        }
 
-    .game-name {
-      text-align: left;
-      flex-grow: 1; /* Para o nome ocupar o espaço restante */
-    }
+        .sapoti-img {
+            width: 220px; /* Reduzido a largura */
+            height: 250px; /* Ajustada a altura */
+            margin-bottom: 20px;
+            border-radius: 15px;
+        }
 
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
-  </style>
+        .slots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .slot {
+            width: 40px; /* Aumentado para melhorar a interação */
+            height: 50px; /* Aumentado para dar mais espaço */
+            font-size: 30px; /* Aumentado o tamanho da fonte */
+            font-weight: bold;
+            border-bottom: 2px solid #ffffff;
+            text-align: center;
+            line-height: 50px; /* Ajustado o alinhamento vertical */
+        }
+
+        .letters {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px; /* Aumentado o espaçamento */
+        }
+
+        .letter {
+            width: 50px; /* Aumentado o tamanho das letras */
+            height: 50px; /* Aumentado o tamanho das letras */
+            font-size: 28px; /* Aumentado o tamanho da fonte */
+            color: #ffffff;
+            border-radius: 8px;
+            line-height: 50px; /* Ajustado para o alinhamento central */
+            cursor: pointer;
+            user-select: none;
+            font-weight: bold;
+        }
+
+        .letter.dragging {
+            opacity: 0.5;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .btn-restart {
+            font-size: 1.5rem;
+            padding: 10px 10px;
+            border-radius: 30px;
+            background: linear-gradient(145deg, #8b4513, #6a2c0e);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        /* MENU */
+        .menu {
+            position: fixed;
+            top: 20px;
+            right: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            transition: right 0.3s ease;
+            z-index: 999;
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px 0;
+            font-size: 18px;
+            border-bottom: 1px solid #444;
+        }
+
+        .menu a:hover {
+            background-color: #444;
+        }
+
+        .hamburger {
+            position: fixed;
+            top: 1px;
+            right: 3px;
+            background: none;
+            border: none;
+            color: #f8f9fa;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 1000;
+            padding: 10px;
+        }
+
+        .menu.open {
+            right: 0;
+        }
+
+        /* Estilos para as sobreposições de sucesso e derrota */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .overlay img {
+            max-width: 80%;
+            max-height: 80%;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .overlay p {
+            color: white;
+            font-size: 2.5rem;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .overlay button {
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            background: linear-gradient(145deg, #8b4513, #6a2c0e);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .overlay button:hover {
+            background: linear-gradient(145deg, #8b4513, #6a2c0e);
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
 
-    <a href="memoria.html">
-      <div class="game-option d-flex align-items-center justify-content-center">
-        <img src="memoria.png" alt="ícone QUEBRA-CABEÇA">
-        <span class="game-name">JOGO DA MEMÓRIA</span>
-      </div>
-    </a>
+    <button class="hamburger" id="hamburgerBtn">&#9776;</button>
+    <div class="menu" id="menu">
+        <a href="select.html">Voltar para seleção de jogos</a>
+        <a href="#">Sobre</a>
+    </div>
 
-    <a href="resgate.html">
-      <div class="game-option d-flex align-items-center justify-content-center">
-        <img src="RESGATE DO CACÁ.png" alt="ícone RESGATE DO CACÁ">
-        <span class="game-name">RESGATE DO CACÁ</span>
-      </div>
-    </a>
+    <h1>Qual o nome do personagem?</h1>
 
-    <a href="quebra-cabeca.html">
-      <div class="game-option d-flex align-items-center justify-content-center">
-        <img src="QUEBRA CABEÇA.png" alt="ícone QUEBRA-CABEÇA">
-        <span class="game-name">QUEBRA-CABEÇA</span>
-      </div>
-    </a>
+    <div id="timer">60</div>
 
-    <a href="quiz.html">
-      <div class="game-option d-flex align-items-center justify-content-center">
-        <img src="quiz.png" alt="ícone QUAL É A PALAVRA?">
-        <span class="game-name">QUAL É A PALAVRA?</span>
-      </div>
-    </a>
-  </div>
-  <script>
-     if ('serviceWorker' in navigator) {
+    <div class="quiz-container">
+        <img src="qual nome do personagem.png" alt="Sapoti" class="sapoti-img" />
+
+        <div class="slots" id="slots"></div>
+        <div class="letters" id="letters"></div>
+
+        <div class="message" id="message"></div>
+        <button class="btn btn-restart" id="restartGameBtn">Reiniciar</button>
+    </div>
+
+    <div id="successOverlay" class="overlay">
+        <img src="sucesso.jpg" alt="Parabéns, você ganhou!">
+        <button id="playAgainSuccess">Jogar Novamente</button>
+    </div>
+
+    <div id="defeatOverlay" class="overlay">
+        <img src="falha.jpg" alt="Tempo esgotado, tente novamente!">
+        <button id="playAgainDefeat">Jogar Novamente</button>
+    </div>
+
+    <script>
+        const correctName = ['S', 'A', 'P', 'O', 'T', 'I'];
+        let draggedLetter = null;
+        let timerInterval; // Renomeado para evitar conflito com 'timer' do alert
+        let timeLeft = 60; // Tempo inicial do jogo
+
+        const slotsContainer = document.getElementById('slots');
+        const lettersContainer = document.getElementById('letters');
+        const message = document.getElementById('message');
+        const timerElement = document.getElementById('timer');
+        const restartGameBtn = document.getElementById('restartGameBtn');
+
+        const successOverlay = document.getElementById('successOverlay');
+        const defeatOverlay = document.getElementById('defeatOverlay');
+        const playAgainSuccessBtn = document.getElementById('playAgainSuccess');
+        const playAgainDefeatBtn = document.getElementById('playAgainDefeat');
+
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function initGame() {
+            clearInterval(timerInterval); // Limpa qualquer timer anterior
+            hideOverlays(); // Garante que as sobreposições estejam ocultas
+            
+            slotsContainer.innerHTML = '';
+            lettersContainer.innerHTML = '';
+            message.innerText = '';
+            message.style.color = "#ffffff"; // Volta a cor padrão da mensagem
+            timeLeft = 60; // Reinicia o tempo para 60 segundos
+            timerElement.innerText = timeLeft;
+
+            // Criar slots vazios
+            for (let i = 0; i < correctName.length; i++) {
+                const slot = document.createElement('div');
+                slot.classList.add('slot');
+                slot.dataset.index = i;
+                slot.ondragover = e => e.preventDefault();
+                slot.ondrop = handleDrop;
+                slotsContainer.appendChild(slot);
+            }
+
+            // Letras embaralhadas
+            const shuffled = shuffle([...correctName]);
+            for (let letter of shuffled) {
+                const letterEl = document.createElement('div');
+                letterEl.classList.add('letter');
+                letterEl.innerText = letter;
+                letterEl.setAttribute('draggable', 'true');
+                letterEl.ondragstart = handleDragStart;
+                letterEl.ondragend = handleDragEnd;
+                lettersContainer.appendChild(letterEl);
+            }
+
+            startTimer(); // Inicia o cronômetro
+        }
+
+        function handleDragStart(e) {
+            draggedLetter = e.target;
+            setTimeout(() => e.target.classList.add('dragging'), 0);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDrop(e) {
+            if (!draggedLetter) return;
+            // Se o slot estiver vazio, ou se for a mesma letra que está sendo movida de volta
+            if (e.target.innerText === '' || e.target === draggedLetter) { 
+                e.target.innerText = draggedLetter.innerText;
+                draggedLetter.remove(); // Remove a letra original
+                checkCompletion();
+            } else if (e.target.classList.contains('letter')) { // Se arrastar para outra letra no slot
+                // Troca as letras
+                const tempLetter = e.target.innerText;
+                e.target.innerText = draggedLetter.innerText;
+                draggedLetter.innerText = tempLetter; // Coloca a letra original no lugar da arrastada
+
+                // Mova a letra arrastada de volta para o container de letras (ou recrie-a)
+                // Para simplificar, vou recriar e remover a antiga.
+                const newLetterEl = document.createElement('div');
+                newLetterEl.classList.add('letter');
+                newLetterEl.innerText = tempLetter;
+                newLetterEl.setAttribute('draggable', 'true');
+                newLetterEl.ondragstart = handleDragStart;
+                newLetterEl.ondragend = handleDragEnd;
+                lettersContainer.appendChild(newLetterEl);
+                draggedLetter.remove();
+                
+                checkCompletion();
+            }
+            draggedLetter = null; // Limpa a letra arrastada
+        }
+
+        function checkCompletion() {
+            const slots = Array.from(document.querySelectorAll('.slot'));
+            const currentGuess = slots.map(s => s.innerText).join('');
+
+            if (currentGuess.length === correctName.length) {
+                if (currentGuess === correctName.join('')) {
+                    clearInterval(timerInterval); // Para o cronômetro
+                    showOverlay(successOverlay); // Exibe tela de sucesso
+                } else {
+                }
+            }
+        }
+
+        // Inicia o cronômetro
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    timerElement.innerText = timeLeft;
+                } else {
+                    clearInterval(timerInterval);
+                    message.innerText = "Tempo esgotado! Tente novamente!";
+                    message.style.color = "red";
+                    showOverlay(defeatOverlay); // Exibe tela de derrota
+                }
+            }, 1000);
+        }
+
+        // Funções para mostrar e esconder os overlays
+        function showOverlay(overlayElement) {
+            overlayElement.classList.add('show');
+        }
+
+        function hideOverlays() {
+            successOverlay.classList.remove('show');
+            defeatOverlay.classList.remove('show');
+        }
+
+        // Event Listeners para o menu e botões de jogar novamente
+        document.getElementById('hamburgerBtn').addEventListener('click', () => {
+            document.getElementById('menu').classList.toggle('open');
+        });
+
+        restartGameBtn.addEventListener('click', initGame);
+        
+        // Alteração aqui: quando o botão de "Jogar Novamente" for clicado, redireciona para a página de seleção de jogos
+        playAgainSuccessBtn.addEventListener('click', () => {
+            window.location.href = 'select.html'; // Redireciona para a página de seleção
+        });
+
+        playAgainDefeatBtn.addEventListener('click', () => {
+            window.location.href = 'select.html'; // Redireciona para a página de seleção
+        });
+
+        window.onload = initGame; // Inicia o jogo ao carregar a página
+
+         if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js')
       .then(reg => console.log("Service Worker registrado ✅"))
       .catch(err => console.error("Erro ao registrar Service Worker ❌", err));
   }
-  </script>
+    </script>
 </body>
 </html>
