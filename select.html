@@ -7,10 +7,21 @@
   <meta name="theme-color" content="#8b4513">
   <title>Seleção de Jogos</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Barthowheel Italic.ttf">
+  <link rel="stylesheet" href="Barthowheel Regular.ttf">
+  <link href="https://fonts.googleapis.com/css2?family=Barthowheel&display=swap" rel="stylesheet">
+
   <style>
-    body,html {
-      font-family: 'Roboto', sans-serif;
+    @font-face {
+      font-family: 'Barthowheel';
+      src: url('Barthowheel Itali.ttf') format('ttf'),
+           url('Barthowheel. Regular.ttf') format('tff');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    body, html {
+      font-family: 'Barthowheel', sans-serif;
       height: 100%;
       margin: 0;
       display: flex;
@@ -23,31 +34,32 @@
     .container {
       padding-top: 60px;
       text-align: center;
-      color: #fff;
+      font-family: 'Barthowheel', sans-serif;
+      color: black;
     }
 
     .game-option {
       margin: 20px;
       padding: 10px;
-      background-color: #2a792e;
       border-radius: 20px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
       width: 80%;
       max-width: 400px;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: row;
     }
 
     .game-option img {
-      width: 70px; /* Aumentei o tamanho da imagem */
-      height: 70px; /* Aumentei o tamanho da imagem */
-      margin-right: 10px; /* Diminuí o espaço entre a imagem e o nome */
+      width: 20vw;  /* Ajuste a largura com base na largura da tela */
+      height: auto; /* Manter a proporção da imagem */
+      margin-right: 10px;
     }
 
     .game-name {
       text-align: left;
-      flex-grow: 1; /* Para o nome ocupar o espaço restante */
+      flex-grow: 1;
+      font-family: 'Barthowheel', sans-serif;
     }
 
     a {
@@ -58,41 +70,16 @@
 </head>
 <body>
   <div class="container">
-
-    <a href="memoria.html">
-      <div class="game-option d-flex align-items-center justify-content-center">
-        <img src="memoria.png" alt="ícone QUEBRA-CABEÇA">
-        <span class="game-name">JOGO DA MEMÓRIA</span>
-      </div>
-    </a>
-
-    <a href="resgate.html">
-      <div class="game-option d-flex align-items-center justify-content-center">
-        <img src="RESGATE DO CACÁ.png" alt="ícone RESGATE DO CACÁ">
-        <span class="game-name">RESGATE DO CACÁ</span>
-      </div>
-    </a>
-
-    <a href="quebra-cabeca.html">
-      <div class="game-option d-flex align-items-center justify-content-center">
-        <img src="QUEBRA CABEÇA.png" alt="ícone QUEBRA-CABEÇA">
-        <span class="game-name">QUEBRA-CABEÇA</span>
-      </div>
-    </a>
-
-    <a href="quiz.html">
-      <div class="game-option d-flex align-items-center justify-content-center">
-        <img src="quiz.png" alt="ícone QUAL É A PALAVRA?">
-        <span class="game-name">QUAL É A PALAVRA?</span>
-      </div>
-    </a>
+    <div class="game-option">
+      <img src="b5.png" alt="Imagem para teste de monitor touch">
+    </div>
   </div>
   <script>
-     if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(reg => console.log("Service Worker registrado ✅"))
-      .catch(err => console.error("Erro ao registrar Service Worker ❌", err));
-  }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log("Service Worker registrado ✅"))
+        .catch(err => console.error("Erro ao registrar Service Worker ❌", err));
+    }
   </script>
 </body>
 </html>
