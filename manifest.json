@@ -1,21 +1,21 @@
 {
   "name": "Capi Valley",
-  "short_name": "Boas Vindas",
+  "short_name": "Capi",
   "start_url": "welcome.html",
   "display": "standalone",
-  "background_color": " #8b4513, #6a2c0e",
-  "theme_color": " #8b4513, #6a2c0e",
+  "background_color": "#8b4513",
+  "theme_color": "#8b4513",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "capa de carregamento.jpg",
+      "src": "/memoria4.jpg",
       "sizes": "192x192",
-      "type": "image/jpg"
+      "type": "image/png"
     },
     {
-      "src": "capa de carregamento.jpg",
+      "src": "/memoria4.jpg",
       "sizes": "512x512",
-      "type": "image/jpg"
+      "type": "image/png"
     }
   ]
 }
