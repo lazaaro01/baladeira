@@ -1,291 +1,389 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quebra-Cabeça</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background: url('basememoria.png') no-repeat center center fixed;
-      background-size: cover;
-      font-family: 'Roboto', sans-serif;
-      text-align: center;
-      padding: 20px;
-      user-select: none;
-      transition: background-image 0.5s ease-in-out;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quebra-Cabeça</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: url('basememoria.png') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+            padding: 20px;
+            user-select: none;
+            transition: background-image 0.5s ease-in-out;
+        }
 
-    h1 {
-      margin-bottom: 20px;
-      color: #8d4b00;
-    }
+        h1 {
+            margin-bottom: 20px;
+            color: #8d4b00;
+        }
 
-    .puzzle-container {
-      position: relative;
-      width: 300px;
-      height: 300px;
-      margin: 150px auto;
-      border: 2px solid #ccc;
-      background-image: url('quebra cabeça 3.png');
-      background-size: cover;
-      background-position: center;
-      opacity: 0.8;
-      transition: opacity 0.5s ease-in-out;
-    }
+        .puzzle-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 150px auto;
+            border: 2px solid #ccc;
+            background-image: url('qb0.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.8;
+            transition: opacity 0.5s ease-in-out;
+            right: 15px;
+        }
 
-    .puzzle-container.completed {
-      opacity: 1 !important;
-    }
+        .puzzle-container.completed {
+            opacity: 1 !important;
+        }
 
-    .puzzle-board {
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      width: 100%;
-      height: 100%;
-      gap: 2px;
-    }
+        .puzzle-board {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: grid;
+            grid-template-columns: repeat(3, 100px); /* Tamanho fixo das colunas */
+            grid-template-rows: repeat(3, 100px); /* Tamanho fixo das linhas */
+            width: 100%;
+            height: 100%;
+            gap: 2px;
+            box-sizing: border-box; /* Garantir que a borda não afete o tamanho */
+        }
 
-    .tile {
-      width: 100px;
-      height: 100px;
-      border: 1px solid #999;
-      touch-action: manipulation;
-    }
+        .tile {
+            width: 100px; /* Tamanho fixo das peças */
+            height: 100px; /* Tamanho fixo das peças */
+            background-size: 100px 100px; /* A imagem não será redimensionada */
+            border: 1px solid #999;
+            touch-action: manipulation;
+            box-sizing: border-box; /* Evitar que bordas ou padding afete o tamanho */
+        }
 
-    .tiles-container {
-      margin-top: 20px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      justify-items: center;
-    }
+        .tiles-container {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            justify-items: center;
+        }
 
-    .draggable {
-      width: 100px;
-      height: 100px;
-      background-image: url('quebra cabeça 2.png');
-      background-size: 300px 300px;
-      border: 1px solid #aaa;
-      touch-action: manipulation;
-      transition: border-color 0.3s ease;
-    }
+        .draggable {
+            width: 100px; /* Tamanho fixo das peças arrastáveis */
+            height: 100px; /* Tamanho fixo das peças arrastáveis */
+            background-image: url('qb1.jpg'); /* Imagem de fundo do quebra-cabeça */
+            background-size: 300px 300px; /* A imagem de fundo fica com tamanho adequado */
+            border: 1px solid #aaa;
+            touch-action: manipulation;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box; /* Evitar redimensionamento das peças */
+        }
 
-    .draggable.correct {
-      border-color: green !important;
-      pointer-events: none;
-    }
+        .draggable.correct {
+            border-color: green !important;
+            pointer-events: none;
+        }
 
-    .btn-restart {
-      margin-top: 20px;
-    }
+        .btn-restart {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            padding: 10px 10px;
+            border-radius: 30px;
+            background: linear-gradient(145deg, #8b4513, #6a2c0e);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            }
 
-    .menu {
-      position: fixed;
-      top: 20px;
-      right: -250px;
-      width: 250px;
-      height: 100%;
-      background-color: #333;
-      color: white;
-      padding: 20px;
-      transition: right 0.3s ease;
-      z-index: 999;
-    }
+        .menu {
+            position: fixed;
+            top: 20px;
+            right: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            transition: right 0.3s ease;
+            z-index: 999;
+        }
 
-    .menu a {
-      color: white;
-      text-decoration: none;
-      display: block;
-      padding: 10px 0;
-      font-size: 18px;
-      border-bottom: 1px solid #444;
-    }
+        .menu a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px 0;
+            font-size: 18px;
+            border-bottom: 1px solid #444;
+        }
 
-    .menu a:hover {
-      background-color: #444;
-    }
+        .menu a:hover {
+            background-color: #444;
+        }
 
-    .hamburger {
-      position: fixed;
-      top: 1px;
-      right: 20px;
-      background: none;
-      border: none;
-      color: #f8f9fa;
-      font-size: 30px;
-      cursor: pointer;
-      z-index: 1000;
-      padding: 10px;
-    }
+        .hamburger {
+            position: fixed;
+            top: 1px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #f8f9fa;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 1000;
+            padding: 10px;
+        }
 
-    .hamburger:focus {
-      outline: none;
-    }
+        .hamburger:focus {
+            outline: none;
+        }
 
-    .menu.open {
-      right: 0;
-    }
+        .menu.open {
+            right: 0;
+        }
 
-    /* Timer */
-    #timer {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      font-size: 24px;
-      color: white;
-      padding: 5px;
-      border-radius: 5px;
-    }
+        /* Timer */
+        #timer {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+        }
 
-    /* Ajustando a imagem de sucesso ou falha para cobrir toda a tela */
-    #successImage, #failImage {
-      display: none;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-size: cover;
-      background-position: center;
-      z-index: 999;
-    }
-  </style>
+        /* Estilos para as sobreposições de sucesso e derrota */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .overlay img {
+            max-width: 80%;
+            max-height: 80%;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .overlay p {
+            color: white;
+            font-size: 2.5rem;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .overlay button {
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            background: linear-gradient(145deg, #8b4513, #6a2c0e);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .overlay button:hover {
+            background: linear-gradient(145deg, #8b4513, #6a2c0e);
+        }
+    </style>
 </head>
+
 <body>
 
-  <button class="hamburger" id="hamburgerBtn">&#9776;</button>
-  <div class="menu" id="menu">
-    <a href="select.html">Voltar para seleção de jogos</a>
-    <a href="#">Sobre</a>
-  </div>
+    <button class="hamburger" id="hamburgerBtn">&#9776;</button>
+    <div class="menu" id="menu">
+        <a href="select.html">Voltar para seleção de jogos</a>
+        <a href="#">Sobre</a>
+    </div>
 
-  <div class="puzzle-container" id="puzzleContainer">
-    <div class="puzzle-board" id="puzzleBoard"></div>
-  </div>
+    <div class="puzzle-container" id="puzzleContainer">
+        <div class="puzzle-board" id="puzzleBoard"></div>
+    </div>
 
-  <div class="tiles-container" id="tilesContainer"></div>
+    <div class="tiles-container" id="tilesContainer"></div>
 
-  <!-- Timer -->
-  <div id="timer">30</div>
+    <div id="timer">60</div>
 
-  <!-- Imagens de sucesso e falha em fundo inteiro -->
-  <div id="successImage" style="background-image: url('sucesso.jpg');"></div>
-  <div id="failImage" style="background-image: url('falha.jpg');"></div>
+    <button class="btn btn-restart" id="restartBtn">Reiniciar</button>
 
-  <button class="btn btn-warning btn-restart" onclick="startPuzzle()">Reiniciar</button>
+    <div id="successOverlay" class="overlay">
+        <img src="sucesso.jpg" alt="Parabéns, você ganhou!">
+        <button id="playAgainSuccess">Jogar Novamente</button>
+    </div>
 
-  <script>
-    const board = document.getElementById('puzzleBoard');
-    const tilesContainer = document.getElementById('tilesContainer');
-    const puzzleContainer = document.getElementById('puzzleContainer');
-    const timerElement = document.getElementById('timer');
-    const successImage = document.getElementById('successImage');
-    const failImage = document.getElementById('failImage');
-    const size = 3;
-    const tileSize = 100;
-    let timeLeft = 30;
-    let timerInterval;
+    <div id="defeatOverlay" class="overlay">
+        <img src="falha.jpg" alt="Tempo esgotado, tente novamente!">
+        <button id="playAgainDefeat">Jogar Novamente</button>
+    </div>
 
-    function createDropZones() {
-      board.innerHTML = '';
-      for (let i = 0; i < size * size; i++) {
-        const dropZone = document.createElement('div');
-        dropZone.classList.add('tile');
-        dropZone.dataset.index = i;
-        dropZone.ondragover = (e) => e.preventDefault();
-        dropZone.ondrop = handleDrop;
-        board.appendChild(dropZone);
-      }
-    }
+    <script>
+        const board = document.getElementById('puzzleBoard');
+        const tilesContainer = document.getElementById('tilesContainer');
+        const puzzleContainer = document.getElementById('puzzleContainer');
+        const timerElement = document.getElementById('timer');
+        const restartBtn = document.getElementById('restartBtn');
+        const successOverlay = document.getElementById('successOverlay');
+        const defeatOverlay = document.getElementById('defeatOverlay');
+        const playAgainSuccessBtn = document.getElementById('playAgainSuccess');
+        const playAgainDefeatBtn = document.getElementById('playAgainDefeat');
 
-    function createDraggableTiles() {
-      tilesContainer.innerHTML = '';
-      puzzleContainer.classList.remove('completed');
+        const size = 3;
+        const tileSize = 100;
+        let timeLeft = 60;
+        let timerInterval;
 
-      const tileIndices = Array.from({ length: size * size }, (_, i) => i).sort(() => Math.random() - 0.5);
-      tileIndices.forEach(index => {
-        const row = Math.floor(index / size);
-        const col = index % size;
-
-        const tile = document.createElement('div');
-        tile.classList.add('draggable');
-        tile.draggable = true;
-        tile.dataset.index = index;
-        tile.style.backgroundPosition = `-${col * tileSize}px -${row * tileSize}px`;
-
-        tile.ondragstart = (e) => {
-          e.dataTransfer.setData("text/plain", index);
-        };
-
-        tilesContainer.appendChild(tile);
-      });
-    }
-
-    function handleDrop(e) {
-      const draggedIndex = e.dataTransfer.getData("text/plain");
-      const draggedTile = document.querySelector(`.draggable[data-index='${draggedIndex}']`);
-      const targetTile = e.target;
-
-      if (draggedTile && !targetTile.hasChildNodes()) {
-        targetTile.appendChild(draggedTile);
-
-        // Verifica se a peça foi colocada corretamente
-        if (targetTile.dataset.index == draggedTile.dataset.index) {
-          draggedTile.classList.add('correct');
-          checkVictory();
+        function createDropZones() {
+            board.innerHTML = '';
+            for (let i = 0; i < size * size; i++) {
+                const dropZone = document.createElement('div');
+                dropZone.classList.add('tile');
+                dropZone.dataset.index = i;
+                dropZone.ondragover = (e) => e.preventDefault();
+                dropZone.ondrop = handleDrop;
+                board.appendChild(dropZone);
+            }
         }
-      }
-    }
 
-    function checkVictory() {
-      const allZones = document.querySelectorAll('.puzzle-board .tile');
-      for (let i = 0; i < allZones.length; i++) {
-        const piece = allZones[i].firstChild;
-        if (!piece || piece.dataset.index != i) {
-          return;
+        function createDraggableTiles() {
+            tilesContainer.innerHTML = '';
+            puzzleContainer.classList.remove('completed');
+
+            const tileIndices = Array.from({ length: size * size }, (_, i) => i).sort(() => Math.random() - 0.5);
+            tileIndices.forEach(index => {
+                const row = Math.floor(index / size);
+                const col = index % size;
+
+                const tile = document.createElement('div');
+                tile.classList.add('draggable');
+                tile.draggable = true;
+                tile.dataset.index = index;
+                tile.style.backgroundPosition = `-${col * tileSize}px -${row * tileSize}px`;
+
+                tile.ondragstart = (e) => {
+                    e.dataTransfer.setData("text/plain", index);
+                };
+
+                tilesContainer.appendChild(tile);
+            });
         }
-      }
-      clearInterval(timerInterval);
-      puzzleContainer.classList.add('completed');
-      successImage.style.display = 'block';
-    }
 
-    function startPuzzle() {
-      createDropZones();
-      createDraggableTiles();
-      startTimer();
-      successImage.style.display = 'none';
-      failImage.style.display = 'none';
-    }
+        function handleDrop(e) {
+            const draggedIndex = e.dataTransfer.getData("text/plain");
+            const draggedTile = document.querySelector(`.draggable[data-index='${draggedIndex}']`);
+            const targetDropZone = e.target.closest('.tile');
 
-    function startTimer() {
-      timeLeft = 30;
-      timerElement.textContent = timeLeft;
+            if (!targetDropZone || targetDropZone.hasChildNodes()) {
+                return;
+            }
 
-      timerInterval = setInterval(() => {
-        timeLeft--;
-        timerElement.textContent = timeLeft;
+            if (draggedTile.parentNode === tilesContainer) {
+                targetDropZone.appendChild(draggedTile);
+            } else {
+                const oldDropZone = draggedTile.parentNode;
+                targetDropZone.appendChild(draggedTile);
+                oldDropZone.innerHTML = '';
+            }
 
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          failImage.style.display = 'block';
-          puzzleContainer.classList.add('completed');
+            if (parseInt(targetDropZone.dataset.index) === parseInt(draggedTile.dataset.index)) {
+                draggedTile.classList.add('correct');
+            } else {
+                draggedTile.classList.remove('correct');
+            }
+            checkVictory();
         }
-      }, 1000);
-    }
 
-    const hamburger = document.getElementById('hamburgerBtn');
-    const menu = document.getElementById('menu');
-    hamburger.addEventListener('click', () => {
-      menu.classList.toggle('open');
-    });
+        function checkVictory() {
+            const allDropZones = document.querySelectorAll('.puzzle-board .tile');
+            let allCorrect = true;
+            for (let i = 0; i < allDropZones.length; i++) {
+                const piece = allDropZones[i].firstChild;
+                if (!piece || parseInt(piece.dataset.index) !== i) {
+                    allCorrect = false;
+                    break;
+                }
+            }
+            if (allCorrect) {
+                clearInterval(timerInterval);
+                puzzleContainer.classList.add('completed');
+                showOverlay(successOverlay);
+            }
+        }
 
-    window.onload = startPuzzle;
-  </script>
+        function startPuzzle() {
+            createDropZones();
+            createDraggableTiles();
+            startTimer();
+            hideOverlays();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 60;
+            timerElement.textContent = timeLeft;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    showOverlay(defeatOverlay);
+                    puzzleContainer.classList.add('completed');
+                }
+            }, 1000);
+        }
+
+        function showOverlay(overlayElement) {
+            overlayElement.classList.add('show');
+        }
+
+        function hideOverlays() {
+            successOverlay.classList.remove('show');
+            defeatOverlay.classList.remove('show');
+        }
+
+        // Event listeners para os botões de reiniciar
+        restartBtn.addEventListener('click', startPuzzle);
+        playAgainSuccessBtn.addEventListener('click', () => {
+            window.location.href = 'select.html'; // Redireciona para a página select.html
+        });
+        playAgainDefeatBtn.addEventListener('click', () => {
+            window.location.href = 'select.html'; // Redireciona para a página select.html
+        });
+
+        // Menu de hambúrguer
+        const hamburger = document.getElementById('hamburgerBtn');
+        const menu = document.getElementById('menu');
+        hamburger.addEventListener('click', () => {
+            menu.classList.toggle('open');
+        });
+
+        // Inicia o jogo quando a página carrega
+        window.onload = startPuzzle;
+    </script>
 </body>
+
 </html>
