@@ -15,15 +15,15 @@
     body {
       margin: 0;
       padding: 0;
-      background: url('cacaimg.jpg') no-repeat center center fixed;
+      background: url('lagolimpo.jpg') no-repeat center center fixed;
       background-size: cover;
       font-family: 'Roboto', sans-serif;
       overflow: hidden;
     }
 
     .lixo {
-      width: 60px;
-      height: 60px;
+      width: 120px;  /* Tamanho ajustado */
+      height: 120px; /* Tamanho ajustado */
       position: absolute;
       touch-action: none;
       z-index: 10;
@@ -102,6 +102,57 @@
       z-index: 1000;
     }
 
+    .tela-final-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+    }
+
+    .tela-final-container img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+    }
+
+    .tela-final-container button {
+      margin-top: 20px;
+      padding: 10px 30px;
+      font-size: 20px;
+      border: none;
+      background-color: #ffc107;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .tela-final-container button:hover {
+      background-color: #e0a800;
+    }
+
+    .botao-reiniciar {
+      width: 250px;
+      position: absolute;
+      bottom: 50px;
+      left: 39%;
+    }
+
+    .botao-reiniciar:hover {
+      transform: scale(1.1);
+    }
+
+    /* Áreas invisíveis das lixeiras */
+    .dropzone {
+      position: absolute;
+      width: 6vw;
+      height: 8vh;
+      z-index: 1;
+    }
   </style>
 </head>
 <body>
@@ -115,29 +166,53 @@
   <!-- Timer -->
   <div id="timer" class="timer">60</div>
 
-  <!-- Lixos -->
-  <img src="lixo_plastico.png" class="lixo" data-tipo="plástico" style="top: 60%; right: 80%;" draggable="true">
-  <img src="lixo_vidro.png" class="lixo" data-tipo="vidro" style="top: 65%; left: 40%;" draggable="true">
-  <img src="lixo_vidro.png" class="lixo" data-tipo="vidro" style="top: 65%; right: 80%;" draggable="true">
-  <img src="lixo_metal.png" class="lixo" data-tipo="metal" style="top: 70%; left: 30%;" draggable="true">
-  <img src="lixo_metal.png" class="lixo" data-tipo="metal" style="top: 70%; left: 60%;" draggable="true">
-  <img src="lixo_papel.png" class="lixo" data-tipo="papel" style="top: 75%; left: 50%;" draggable="true">
-  <img src="lixo_papel.png" class="lixo" data-tipo="papel" style="top: 60%; left: 30%;" draggable="true">
-  <img src="lixo_papel.png" class="lixo" data-tipo="papel" style="top: 60%; left: 70%;" draggable="true">
+  <!-- Áreas das lixeiras -->
+  <div class="dropzone" data-tipo="vidro" style="top: 27%; left: 12.5%;"></div>
+  <div class="dropzone" data-tipo="metal" style="top: 27%; left: 31%;"></div>
+  <div class="dropzone" data-tipo="papel" style="top: 27%; left: 49%;"></div>
+  <div class="dropzone" data-tipo="plastico" style="top: 27%; left: 67%;"></div>
 
-  <!-- Personagens -->
-  <img src="Cacá.png" class="personagem1" data-tipo="capivara1" style="top: 80%; left: 70%;" draggable="true">
-  <img src="Capitu.png" class="personagem2" data-tipo="capivara2" style="top: 80%; left: 5%;" draggable="true">
+  <!-- Lixos duplicados e ajustados para cima e para a direita -->
+  <img src="lacf.png" class="lixo" data-tipo="vidro" style="top: 55%; left: 20%;" draggable="true">
+  <img src="lacf.png" class="lixo" data-tipo="vidro" style="top: 70%; left: 25%;" draggable="true"> <!-- Duplicado -->
+  <img src="meta.png" class="lixo" data-tipo="metal" style="top: 60%; left: 35%;" draggable="true">
+  <img src="meta.png" class="lixo" data-tipo="metal" style="top: 75%; left: 40%;" draggable="true"> <!-- Duplicado -->
+  <img src="pap.png" class="lixo" data-tipo="papel" style="top: 65%; left: 50%;" draggable="true">
+  <img src="pap.png" class="lixo" data-tipo="papel" style="top: 80%; left: 55%;" draggable="true"> <!-- Duplicado -->
+  <img src="sa.png" class="lixo" data-tipo="plastico" style="top: 70%; left: 65%;" draggable="true">
+  <img src="sa.png" class="lixo" data-tipo="plastico" style="top: 85%; left: 70%;" draggable="true"> <!-- Duplicado -->
+
+  <!-- Tela de fim de jogo com imagem e botão -->
+  <div id="telaFinalContainer" class="tela-final-container">
+    <img id="telaFinal" src="" alt="Resultado final">
+    <a href="select.html">
+      <img src="reiniciar.png" alt="Reiniciar" class="botao-reiniciar">
+    </a>
+  </div>
 
   <script>
     const hamburger = document.getElementById('hamburgerBtn');
     const menu = document.getElementById('menu');
     const timerDisplay = document.getElementById('timer');
+    const telaFinal = document.getElementById('telaFinal');
+    const telaFinalContainer = document.getElementById('telaFinalContainer');
     let timeLeft = 60;
 
     hamburger.addEventListener('click', () => {
       menu.classList.toggle('open');
     });
+
+    function verificarFimDoJogo() {
+      const lixosRestantes = document.querySelectorAll('.lixo');
+      if (lixosRestantes.length === 0) {
+        mostrarTelaFinal('14.jpg');
+      }
+    }
+
+    function mostrarTelaFinal(img) {
+      telaFinal.src = img;
+      telaFinalContainer.style.display = 'flex';
+    }
 
     function startTimer() {
       const timerInterval = setInterval(() => {
@@ -146,55 +221,79 @@
           timerDisplay.textContent = timeLeft;
         } else {
           clearInterval(timerInterval);
-          alert('Tempo esgotado!');
+          const lixosRestantes = document.querySelectorAll('.lixo');
+          if (lixosRestantes.length === 0) {
+            mostrarTelaFinal('14.jpg');
+          } else {
+            mostrarTelaFinal('13.jpg');
+          }
         }
       }, 1000);
     }
 
-    window.onload = startTimer;
+    window.onload = () => {
+      startTimer();
 
-    const lixos = document.querySelectorAll('.lixo');
+      const lixos = document.querySelectorAll('.lixo');
 
-    lixos.forEach(lixo => {
-      let offsetX, offsetY;
+      lixos.forEach(lixo => {
+        let offsetX, offsetY;
 
-      lixo.addEventListener('pointerdown', startDrag);
+        lixo.addEventListener('pointerdown', startDrag);
 
-      function startDrag(e) {
-        offsetX = e.clientX - lixo.getBoundingClientRect().left;
-        offsetY = e.clientY - lixo.getBoundingClientRect().top;
-        document.addEventListener('pointermove', drag);
-        document.addEventListener('pointerup', drop);
-      }
-
-      function drag(e) {
-        lixo.style.left = `${e.clientX - offsetX}px`;
-        lixo.style.top = `${e.clientY - offsetY}px`;
-      }
-
-      function drop(e) {
-        document.removeEventListener('pointermove', drag);
-        document.removeEventListener('pointerup', drop);
-
-        const x = e.clientX;
-        const y = e.clientY;
-
-        const dentroAreaLixeiras =
-          x >= window.innerWidth * 0.15 && x <= window.innerWidth * 0.85 &&
-          y >= window.innerHeight * 0.43 && y <= window.innerHeight * 0.58;
-
-        if (dentroAreaLixeiras) {
-          lixo.classList.add('success');
-          setTimeout(() => lixo.remove(), 800);
+        function startDrag(e) {
+          offsetX = e.clientX - lixo.getBoundingClientRect().left;
+          offsetY = e.clientY - lixo.getBoundingClientRect().top;
+          document.addEventListener('pointermove', drag);
+          document.addEventListener('pointerup', drop);
         }
-      }
-    });
 
-     if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(reg => console.log("Service Worker registrado ✅"))
-      .catch(err => console.error("Erro ao registrar Service Worker ❌", err));
-  }
+        function drag(e) {
+          lixo.style.left = `${e.clientX - offsetX}px`;
+          lixo.style.top = `${e.clientY - offsetY}px`;
+        }
+
+        function drop(e) {
+          document.removeEventListener('pointermove', drag);
+          document.removeEventListener('pointerup', drop);
+
+          const tipo = lixo.dataset.tipo;
+          const lixoRect = lixo.getBoundingClientRect();
+          const dropzones = document.querySelectorAll('.dropzone');
+
+          let acertou = false;
+
+          dropzones.forEach(zone => {
+            const zoneTipo = zone.dataset.tipo;
+            const zoneRect = zone.getBoundingClientRect();
+
+            const sobrepoe =
+              lixoRect.left < zoneRect.right &&
+              lixoRect.right > zoneRect.left &&
+              lixoRect.top < zoneRect.bottom &&
+              lixoRect.bottom > zoneRect.top;
+
+            if (tipo === zoneTipo && sobrepoe) {
+              acertou = true;
+            }
+          });
+
+          if (acertou) {
+            lixo.classList.add('success');
+            setTimeout(() => {
+              lixo.remove();
+              verificarFimDoJogo();
+            }, 800);
+          }
+        }
+      });
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log("Service Worker registrado ✅"))
+          .catch(err => console.error("Erro ao registrar Service Worker ❌", err));
+      }
+    };
   </script>
 </body>
 </html>
