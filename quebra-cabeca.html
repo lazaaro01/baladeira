@@ -9,8 +9,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <style>
+        * {
+            touch-action: none;
+            box-sizing: border-box;
+        }
         body {
-            background: url('basememoria.png') no-repeat center center fixed;
+            background: url('backrund-3.png') no-repeat center center fixed;
             background-size: cover;
             font-family: 'Roboto', sans-serif;
             text-align: center;
@@ -30,7 +34,6 @@
             height: 300px;
             margin: 150px auto;
             border: 2px solid #ccc;
-            background-image: url('qb0.jpg');
             background-size: cover;
             background-position: center;
             opacity: 0.8;
@@ -47,21 +50,22 @@
             top: 0;
             left: 0;
             display: grid;
-            grid-template-columns: repeat(3, 100px); /* Tamanho fixo das colunas */
-            grid-template-rows: repeat(3, 100px); /* Tamanho fixo das linhas */
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
             width: 100%;
             height: 100%;
             gap: 2px;
-            box-sizing: border-box; /* Garantir que a borda não afete o tamanho */
+            box-sizing: border-box;
         }
 
         .tile {
-            width: 100px; /* Tamanho fixo das peças */
-            height: 100px; /* Tamanho fixo das peças */
-            background-size: 100px 100px; /* A imagem não será redimensionada */
+            width: 100px;
+            height: 100px;
             border: 1px solid #999;
-            touch-action: manipulation;
-            box-sizing: border-box; /* Evitar que bordas ou padding afete o tamanho */
+            touch-action: none;
+            box-sizing: border-box;
+            position: relative; /* Importante para posicionar a peça draggable dentro dela */
+            overflow: hidden; /* Garante que a peça não "transborde" */
         }
 
         .tiles-container {
@@ -73,19 +77,25 @@
         }
 
         .draggable {
-            width: 100px; /* Tamanho fixo das peças arrastáveis */
-            height: 100px; /* Tamanho fixo das peças arrastáveis */
-            background-image: url('qb1.jpg'); /* Imagem de fundo do quebra-cabeça */
-            background-size: 300px 300px; /* A imagem de fundo fica com tamanho adequado */
+            width: 100px;
+            height: 100px;
+            background-size: 300px 300px; /* A imagem completa tem 300x300px */
             border: 1px solid #aaa;
-            touch-action: manipulation;
-            transition: border-color 0.3s ease;
-            box-sizing: border-box; /* Evitar redimensionamento das peças */
+            touch-action: none;
+            transition: transform 0.1s ease, border-color 0.3s ease;
+            box-sizing: border-box;
+            position: relative; /* Para poder ser arrastado com transform */
+            z-index: 10; /* Para aparecer acima de outros elementos enquanto arrasta */
         }
 
         .draggable.correct {
             border-color: green !important;
-            pointer-events: none;
+            pointer-events: none; /* Não permite interagir com a peça depois de correta */
+            position: absolute; /* Para ficar dentro do .tile */
+            top: 0;
+            left: 0;
+            z-index: 1; /* Fica abaixo de peças sendo arrastadas */
+            transform: translate(0, 0) !important; /* Garante que ela não tenha offset */
         }
 
         .btn-restart {
@@ -97,7 +107,7 @@
             color: white;
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            }
+        }
 
         .menu {
             position: fixed;
@@ -125,25 +135,21 @@
             background-color: #444;
         }
 
-        .hamburger {
-            position: fixed;
-            top: 1px;
-            right: 20px;
-            background: none;
-            border: none;
-            color: #f8f9fa;
-            font-size: 30px;
-            cursor: pointer;
-            z-index: 1000;
-            padding: 10px;
-        }
-
-        .hamburger:focus {
-            outline: none;
-        }
-
         .menu.open {
             right: 0;
+        }
+
+        /* Estilo para o botão de hambúrguer */
+        .hamburger {
+            font-size: 30px;
+            color: white;
+            background: none;
+            border: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            cursor: pointer;
         }
 
         /* Timer */
@@ -164,15 +170,17 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
+            /* Usamos flexbox para centralizar e organizar o conteúdo */
             display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+            flex-direction: column; /* Coloca os itens em coluna */
+            justify-content: flex-end; /* Alinha o conteúdo ao final (botão embaixo) */
+            align-items: center; /* Centraliza horizontalmente */
             z-index: 1001;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.5s ease, visibility 0.5s ease;
+            background-color: rgba(0, 0, 0, 0.8); /* Fundo escuro transparente */
+            padding-bottom: 5vh; /* Espaçamento na parte inferior para o botão */
         }
 
         .overlay.show {
@@ -180,34 +188,32 @@
             visibility: visible;
         }
 
-        .overlay img {
-            max-width: 80%;
-            max-height: 80%;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        .overlay img:not(#playAgainSuccess):not(#playAgainDefeat) {
+            /* Imagens de parabéns/derrota */
+            width: 100%; /* Ocupa 100% da largura do overlay */
+            height: 100%; /* Ocupa 100% da altura do overlay */
+            object-fit: contain; /* Garante que a imagem se ajuste sem cortar ou esticar demais */
+            position: absolute; /* Posiciona absolutamente para cobrir tudo */
+            top: 0;
+            left: 0;
+            border-radius: 0; /* Remove bordas arredondadas se houver */
         }
 
+        /* Esconde o parágrafo de mensagem no overlay se não for mais necessário */
         .overlay p {
-            color: white;
-            font-size: 2.5rem;
-            margin-top: 20px;
-            text-align: center;
+            display: none; 
         }
 
-        .overlay button {
-            padding: 15px 30px;
-            font-size: 1.5rem;
-            background: linear-gradient(145deg, #8b4513, #6a2c0e);
-            color: white;
-            border: none;
-            border-radius: 5px;
+        /* Estilos para os botões "Jogar Novamente" dentro dos overlays */
+        .overlay img#playAgainSuccess,
+        .overlay img#playAgainDefeat {
             cursor: pointer;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
-        }
-
-        .overlay button:hover {
-            background: linear-gradient(145deg, #8b4513, #6a2c0e);
+            width: 300px; /* Tamanho fixo para o botão, ajuste conforme necessário */
+            height: auto; /* Mantém a proporção */
+            position: relative; /* Para que fique acima da imagem de fundo */
+            z-index: 1002; /* Garante que o botão esteja acima da imagem de parabéns/derrota */
+            margin-top: auto; /* Empurra o botão para a parte inferior usando flexbox */
+            margin-bottom: 20px; /* Espaçamento abaixo do botão */
         }
     </style>
 </head>
@@ -215,9 +221,9 @@
 <body>
 
     <button class="hamburger" id="hamburgerBtn">&#9776;</button>
+
     <div class="menu" id="menu">
         <a href="select.html">Voltar para seleção de jogos</a>
-        <a href="#">Sobre</a>
     </div>
 
     <div class="puzzle-container" id="puzzleContainer">
@@ -228,19 +234,23 @@
 
     <div id="timer">60</div>
 
-    <button class="btn btn-restart" id="restartBtn">Reiniciar</button>
+    <img src="reiniciar.png" alt="Reiniciar" id="restartBtn" style="cursor: pointer; width: 300px; height: auto; margin-top: 100px;" />
 
     <div id="successOverlay" class="overlay">
-        <img src="sucesso.jpg" alt="Parabéns, você ganhou!">
-        <button id="playAgainSuccess">Jogar Novamente</button>
+        <img src="16.jpg" alt="Parabéns, você ganhou!">
+        <img src="jn.png" alt="Jogar Novamente" id="playAgainSuccess">
     </div>
 
     <div id="defeatOverlay" class="overlay">
-        <img src="falha.jpg" alt="Tempo esgotado, tente novamente!">
-        <button id="playAgainDefeat">Jogar Novamente</button>
+        <img src="17.jpg" alt="Tempo esgotado, tente novamente!">
+        <img src="jn.png" alt="Jogar Novamente" id="playAgainDefeat">
     </div>
 
     <script>
+        // Arrays com os nomes das imagens para o fundo e as peças
+        const puzzleBackgrounds = ['patocapretoebranca.jpg', 'noarpretoebranca.jpg', 'capitupretoebranca.jpg', 'cacapretoebranca.jpg']; // Imagens para o fundo
+        const pieceImages = ['patocacolorida.jpg', 'noarcolorida.jpg', 'capitucolorida.jpg', 'cacacolorida.jpg']; // Imagens para as peças
+
         const board = document.getElementById('puzzleBoard');
         const tilesContainer = document.getElementById('tilesContainer');
         const puzzleContainer = document.getElementById('puzzleContainer');
@@ -252,144 +262,276 @@
         const playAgainDefeatBtn = document.getElementById('playAgainDefeat');
 
         const size = 3;
-        const tileSize = 100;
+        const tileSize = 100; // Cada peça tem 100x100px
         let timeLeft = 60;
         let timerInterval;
 
-        function createDropZones() {
-            board.innerHTML = '';
-            for (let i = 0; i < size * size; i++) {
-                const dropZone = document.createElement('div');
-                dropZone.classList.add('tile');
-                dropZone.dataset.index = i;
-                dropZone.ondragover = (e) => e.preventDefault();
-                dropZone.ondrop = handleDrop;
-                board.appendChild(dropZone);
-            }
+        // Função para escolher uma imagem aleatória de um array
+        function getRandomImage(imagesArray) {
+            const randomIndex = Math.floor(Math.random() * imagesArray.length);
+            return imagesArray[randomIndex];
         }
 
-        function createDraggableTiles() {
-            tilesContainer.innerHTML = '';
-            puzzleContainer.classList.remove('completed');
-
-            const tileIndices = Array.from({ length: size * size }, (_, i) => i).sort(() => Math.random() - 0.5);
-            tileIndices.forEach(index => {
-                const row = Math.floor(index / size);
-                const col = index % size;
-
-                const tile = document.createElement('div');
-                tile.classList.add('draggable');
-                tile.draggable = true;
-                tile.dataset.index = index;
-                tile.style.backgroundPosition = `-${col * tileSize}px -${row * tileSize}px`;
-
-                tile.ondragstart = (e) => {
-                    e.dataTransfer.setData("text/plain", index);
-                };
-
-                tilesContainer.appendChild(tile);
-            });
-        }
-
-        function handleDrop(e) {
-            const draggedIndex = e.dataTransfer.getData("text/plain");
-            const draggedTile = document.querySelector(`.draggable[data-index='${draggedIndex}']`);
-            const targetDropZone = e.target.closest('.tile');
-
-            if (!targetDropZone || targetDropZone.hasChildNodes()) {
-                return;
-            }
-
-            if (draggedTile.parentNode === tilesContainer) {
-                targetDropZone.appendChild(draggedTile);
-            } else {
-                const oldDropZone = draggedTile.parentNode;
-                targetDropZone.appendChild(draggedTile);
-                oldDropZone.innerHTML = '';
-            }
-
-            if (parseInt(targetDropZone.dataset.index) === parseInt(draggedTile.dataset.index)) {
-                draggedTile.classList.add('correct');
-            } else {
-                draggedTile.classList.remove('correct');
-            }
-            checkVictory();
-        }
-
-        function checkVictory() {
-            const allDropZones = document.querySelectorAll('.puzzle-board .tile');
-            let allCorrect = true;
-            for (let i = 0; i < allDropZones.length; i++) {
-                const piece = allDropZones[i].firstChild;
-                if (!piece || parseInt(piece.dataset.index) !== i) {
-                    allCorrect = false;
-                    break;
-                }
-            }
-            if (allCorrect) {
-                clearInterval(timerInterval);
-                puzzleContainer.classList.add('completed');
-                showOverlay(successOverlay);
-            }
-        }
-
+        // Função para iniciar o quebra-cabeça
         function startPuzzle() {
+            // Escolhe uma imagem aleatória para o fundo e para as peças
+            const randomIndex = Math.floor(Math.random() * puzzleBackgrounds.length);
+            const randomBackground = puzzleBackgrounds[randomIndex];
+            const randomPieces = pieceImages[randomIndex]; // Associando as peças corretas com o fundo
+
+            // Define a imagem de fundo do quebra-cabeça
+            puzzleContainer.style.backgroundImage = `url('${randomBackground}')`;
+            puzzleContainer.classList.remove('completed'); // Remove a classe de completado
+
+            // Atualiza as peças com a nova imagem
             createDropZones();
-            createDraggableTiles();
+            createDraggableTiles(randomPieces);
+            clearInterval(timerInterval); // Limpa qualquer timer anterior
+            timeLeft = 60; // Reseta o tempo
+            timerElement.textContent = timeLeft; // Atualiza o display do timer
             startTimer();
             hideOverlays();
         }
 
-        function startTimer() {
-            clearInterval(timerInterval);
-            timeLeft = 60;
-            timerElement.textContent = timeLeft;
+        // Função para criar as zonas de "drop" para as peças
+        function createDropZones() {
+            board.innerHTML = ''; // Limpa as zonas de drop
+            for (let i = 0; i < size * size; i++) {
+                const tile = document.createElement('div');
+                tile.classList.add('tile');
+                // Adiciona um data-index para facilitar a verificação da posição
+                tile.setAttribute('data-index', i);
+                board.appendChild(tile);
+            }
+        }
 
+        // Função para criar as peças arrastáveis
+        function createDraggableTiles(imagePath) {
+            tilesContainer.innerHTML = ''; // Limpa as peças anteriores
+            const pieces = []; // Array para embaralhar as peças
+            for (let i = 0; i < size * size; i++) {
+                const tile = document.createElement('div');
+                tile.classList.add('draggable');
+                tile.style.backgroundImage = `url('${imagePath}')`;
+                tile.setAttribute('data-index', i); // Guarda o índice correto da peça
+
+                // Calcule a posição X e Y para esta peça na imagem completa
+                const col = i % size; // Coluna (0, 1, 2)
+                const row = Math.floor(i / size); // Linha (0, 1, 2)
+
+                // O background-position é negativo porque movemos o fundo para a esquerda/cima
+                const backgroundPosX = -col * tileSize;
+                const backgroundPosY = -row * tileSize;
+
+                tile.style.backgroundPosition = `${backgroundPosX}px ${backgroundPosY}px`;
+                tile.style.backgroundSize = `${size * tileSize}px ${size * tileSize}px`; // Garante que a imagem inteira seja o 'tamanho do fundo'
+
+                pieces.push(tile);
+            }
+
+            // Embaralha as peças antes de adicioná-las ao container
+            pieces.sort(() => Math.random() - 0.5);
+            pieces.forEach(piece => tilesContainer.appendChild(piece));
+
+            // Adicionar evento de "touch" para as peças
+            document.querySelectorAll('.draggable').forEach(tile => {
+                tile.addEventListener('touchstart', handleTouchStart, { passive: false });
+                tile.addEventListener('touchmove', handleTouchMove, { passive: false });
+                tile.addEventListener('touchend', handleTouchEnd, { passive: false });
+            });
+        }
+
+        // Variáveis para controlar o toque
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let draggedTile = null;
+        let initialOffsetX = 0;
+        let initialOffsetY = 0;
+
+        // Função para inicializar a movimentação de peças no toque
+        function handleTouchStart(e) {
+            e.preventDefault(); // Impede o comportamento padrão, como zoom ou scroll
+            if (e.touches.length > 1) return; // Não permite multi-toque
+            const touch = e.touches[0]; // Pega o primeiro toque
+
+            const tile = touch.target;
+            if (tile.classList.contains('draggable') && !tile.classList.contains('correct')) {
+                draggedTile = tile;
+                // Calcula o offset inicial para que o dedo esteja no mesmo lugar da peça
+                const rect = draggedTile.getBoundingClientRect();
+                initialOffsetX = touch.clientX - rect.left;
+                initialOffsetY = touch.clientY - rect.top;
+
+                // Move a peça para o corpo do documento para que ela possa ser arrastada livremente
+                // e mantenha a posição relativa ao clique
+                draggedTile.style.position = 'absolute';
+                draggedTile.style.zIndex = '100'; // Garante que a peça arrastada fique acima de tudo
+
+                // Posiciona a peça no local do toque
+                draggedTile.style.left = `${touch.pageX - initialOffsetX}px`;
+                draggedTile.style.top = `${touch.pageY - initialOffsetY}px`;
+            }
+        }
+
+        // Função para mover a peça durante o toque
+        function handleTouchMove(e) {
+            e.preventDefault(); // Impede o comportamento padrão, como zoom ou scroll
+            if (!draggedTile) return; // Se não houver peça sendo arrastada, ignora
+
+            const touch = e.touches[0]; // Pega o primeiro toque
+
+            // Atualiza a posição da peça com base no movimento do dedo e o offset inicial
+            draggedTile.style.left = `${touch.pageX - initialOffsetX}px`;
+            draggedTile.style.top = `${touch.pageY - initialOffsetY}px`;
+        }
+
+        // Função para soltar a peça
+        function handleTouchEnd(e) {
+            e.preventDefault(); // Impede o comportamento padrão
+
+            if (!draggedTile) return; // Se não houver peça sendo arrastada, ignora
+
+            const touch = e.changedTouches[0]; // Pega o toque que terminou
+
+            // Obtém o elemento sob o ponto de onde o toque terminou
+            // O "display: none" temporário na peça arrastada é para garantir que elementFromPoint não pegue a própria peça arrastada
+            draggedTile.style.display = 'none';
+            const targetTile = document.elementFromPoint(touch.clientX, touch.clientY);
+            draggedTile.style.display = 'block';
+
+            // Verifica se a peça foi solta em uma zona de drop (.tile) e se essa zona está vazia
+            if (targetTile && targetTile.classList.contains('tile') && targetTile.children.length === 0) {
+                const droppedPieceIndex = parseInt(draggedTile.getAttribute('data-index'));
+                const targetDropZoneIndex = parseInt(targetTile.getAttribute('data-index'));
+
+                if (droppedPieceIndex === targetDropZoneIndex) {
+                    // A peça foi solta na posição correta
+                    targetTile.appendChild(draggedTile); // Move a peça para dentro da zona de drop
+                    draggedTile.classList.add('correct'); // Marca como correto
+                    draggedTile.style.position = 'absolute'; // Garante que a peça fique dentro do tile
+                    draggedTile.style.top = '0';
+                    draggedTile.style.left = '0';
+                    draggedTile.style.zIndex = '1'; // Abaixo de peças arrastadas
+                    draggedTile.style.border = 'none'; // Remove a borda da peça correta
+                    checkPuzzleCompletion(); // Verifica se o puzzle foi completado
+                } else {
+                    // A peça foi solta em uma zona de drop, mas na posição errada
+                    // Volta a peça para o container de peças arrastáveis
+                    tilesContainer.appendChild(draggedTile);
+                    draggedTile.style.position = 'relative'; // Volta para o fluxo normal do tilesContainer
+                    draggedTile.style.left = 'auto';
+                    draggedTile.style.top = 'auto';
+                    draggedTile.style.zIndex = 'auto';
+                    draggedTile.style.transform = 'translate(0, 0)'; // Garante que não haja offset
+                }
+            } else {
+                // A peça foi solta fora de uma zona de drop válida ou a zona já está ocupada
+                // Volta a peça para o container de peças arrastáveis
+                tilesContainer.appendChild(draggedTile);
+                draggedTile.style.position = 'relative';
+                draggedTile.style.left = 'auto';
+                draggedTile.style.top = 'auto';
+                draggedTile.style.zIndex = 'auto';
+                draggedTile.style.transform = 'translate(0, 0)'; // Garante que não haja offset
+            }
+
+            draggedTile = null; // Reseta o arraste
+        }
+
+        // Função para verificar se o puzzle está completo
+        function checkPuzzleCompletion() {
+            const allDropTiles = document.querySelectorAll('.tile');
+            let correctPiecesInPlace = 0;
+
+            allDropTiles.forEach((dropTile, index) => {
+                if (dropTile.children.length > 0) {
+                    const piece = dropTile.children[0];
+                    const pieceIndex = parseInt(piece.getAttribute('data-index'));
+                    const dropZoneIndex = parseInt(dropTile.getAttribute('data-index'));
+
+                    if (pieceIndex === dropZoneIndex) {
+                        correctPiecesInPlace++;
+                    }
+                }
+            });
+
+            if (correctPiecesInPlace === size * size) {
+                clearInterval(timerInterval);
+                showSuccessOverlay();
+                puzzleContainer.classList.add('completed');
+            }
+        }
+
+
+        // Função para começar o timer
+        function startTimer() {
             timerInterval = setInterval(() => {
                 timeLeft--;
                 timerElement.textContent = timeLeft;
-
-                if (timeLeft <= 0) {
+                if (timeLeft === 0) {
                     clearInterval(timerInterval);
-                    showOverlay(defeatOverlay);
-                    puzzleContainer.classList.add('completed');
+                    showDefeatOverlay();
                 }
             }, 1000);
         }
 
-        function showOverlay(overlayElement) {
-            overlayElement.classList.add('show');
+        // Função para reiniciar o jogo
+        function restartGame() {
+            clearInterval(timerInterval);
+            timeLeft = 60;
+            timerElement.textContent = timeLeft;
+            startPuzzle();
         }
 
+        // Função para mostrar a sobreposição de vitória
+        function showSuccessOverlay() {
+            successOverlay.classList.add('show');
+        }
+
+        // Função para mostrar a sobreposição de derrota
+        function showDefeatOverlay() {
+            defeatOverlay.classList.add('show');
+        }
+
+        // Função para ocultar as sobreposições
         function hideOverlays() {
             successOverlay.classList.remove('show');
             defeatOverlay.classList.remove('show');
         }
 
-        // Event listeners para os botões de reiniciar
-        restartBtn.addEventListener('click', startPuzzle);
-        playAgainSuccessBtn.addEventListener('click', () => {
-            window.location.href = 'select.html'; // Redireciona para a página select.html
-        });
-        playAgainDefeatBtn.addEventListener('click', () => {
-            window.location.href = 'select.html'; // Redireciona para a página select.html
-        });
+        // Eventos dos botões
+        restartBtn.addEventListener('click', restartGame);
+        playAgainSuccessBtn.addEventListener('click', restartGame);
+        playAgainDefeatBtn.addEventListener('click', restartGame);
 
-        // Menu de hambúrguer
-        const hamburger = document.getElementById('hamburgerBtn');
+        // Função para voltar para a página de seleção de jogos
+        function voltarParaSelect() {
+            window.location.href = 'select.html';
+        }
+
+        // Adiciona os event listeners para os botões "Jogar Novamente"
+        playAgainSuccessBtn.addEventListener('click', voltarParaSelect);
+        playAgainDefeatBtn.addEventListener('click', voltarParaSelect);
+
+
+        // Iniciar o quebra-cabeça quando a página for carregada
+        startPuzzle();
+
+        // Adicionando evento de clique no botão de hambúrguer
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
         const menu = document.getElementById('menu');
-        hamburger.addEventListener('click', () => {
+
+        hamburgerBtn.addEventListener('click', () => {
             menu.classList.toggle('open');
         });
 
-        // Inicia o jogo quando a página carrega
-        window.onload = startPuzzle;
-
-         if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(reg => console.log("Service Worker registrado ✅"))
-      .catch(err => console.error("Erro ao registrar Service Worker ❌", err));
-  }
+        // Adiciona um evento para fechar o menu ao clicar fora dele
+        document.addEventListener('click', (event) => {
+            if (!menu.contains(event.target) && !hamburgerBtn.contains(event.target)) {
+                menu.classList.remove('open');
+            }
+        });
     </script>
+
 </body>
 </html>
