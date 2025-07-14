@@ -9,8 +9,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <style>
+        * {
+            touch-action: manipulation;
+            box-sizing: border-box;
+        }
         body {
-            background: url('basememoria.png') no-repeat center center fixed;
+            background: url('memoriafundo.jpg') no-repeat center center fixed;
             background-size: cover;
             height: 100vh;
             margin: 0;
@@ -18,14 +22,14 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
+            position: fixed; /* Isso mantém o body fixo e cobre a tela, essencial para o overlay */
+            width: 100%;
         }
 
         .card {
-            width: 100%;
-            height: 70px;
+            width: 170px;
+            height: 170px;
             background-color: transparent;
-            /* Alterado para transparente para mostrar o card-inner */
-            border: 1px solid #ccc;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -33,26 +37,20 @@
             cursor: pointer;
             user-select: none;
             position: relative;
-            /* Necessário para posicionar o card-inner */
             perspective: 1000px;
-            /* Adiciona perspectiva para o efeito 3D */
         }
 
-        /* Estilos para o efeito de virar */
         .card-inner {
             position: relative;
             width: 100%;
             height: 100%;
             text-align: center;
             transition: transform 0.6s;
-            /* Animação suave */
             transform-style: preserve-3d;
-            /* Garante que os filhos preservem a transformação 3D */
         }
 
         .card.flipped .card-inner {
             transform: rotateY(180deg);
-            /* Vira o card */
         }
 
         .card-front,
@@ -61,27 +59,20 @@
             width: 100%;
             height: 100%;
             -webkit-backface-visibility: hidden;
-            /* Esconde o lado de trás durante a rotação */
             backface-visibility: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
             border-radius: inherit;
-            /* Herda o border-radius do pai se houver */
         }
 
         .card-front {
-            background: url('memoria.png') no-repeat center center;
-            background-color: #2a792e;
-            /* Cor de fundo da capa */
-            background-size: 60px 60px;
+            background: url('fundo-carta.png') no-repeat center center;
+            background-size: 100% 100%;
         }
 
         .card-back {
-            background-color: #2a792e;
-            /* Cor de fundo da imagem */
             transform: rotateY(180deg);
-            /* Inicialmente virado para trás */
         }
 
         .card-back img {
@@ -90,19 +81,18 @@
         }
 
         .matched .card-inner {
-            background-color: #2a792e;
-            /* Cor para cards combinados */
             pointer-events: none;
-            /* Desabilita cliques em cards combinados */
         }
 
         .game-board {
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
+            justify-content: flex-start; /* Alterado para alinhar à esquerda */
             gap: 10px;
             width: 80vw;
             max-width: 1000px;
+            margin: 0 auto; /* Mantém a margem auto para centralizar o bloco, mas o conteúdo dele alinha à esquerda */
+            padding-left: 20px; /* Adicionado um padding para empurrar os cards um pouco para a direita do limite esquerdo */
         }
 
         .col {
@@ -111,7 +101,7 @@
 
         .menu {
             position: fixed;
-            top: 20px;
+            top: 0;
             right: -250px;
             width: 250px;
             height: 100%;
@@ -119,6 +109,8 @@
             color: white;
             padding: 20px;
             transition: right 0.3s ease;
+            z-index: 999;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.5);
         }
 
         .menu a {
@@ -155,7 +147,6 @@
             right: 0;
         }
 
-        /* Estilo para o cronômetro */
         #timer {
             position: fixed;
             top: 3px;
@@ -173,15 +164,17 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
+            /* Usamos flexbox para centralizar e organizar o conteúdo */
             display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+            flex-direction: column; /* Coloca os itens em coluna */
+            justify-content: flex-end; /* Alinha o conteúdo ao final (botão embaixo) */
+            align-items: center; /* Centraliza horizontalmente */
             z-index: 1001;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.5s ease, visibility 0.5s ease;
+            background-color: rgba(0, 0, 0, 0.8); /* Fundo escuro transparente */
+            padding-bottom: 5vh; /* Espaçamento na parte inferior para o botão */
         }
 
         .overlay.show {
@@ -189,40 +182,59 @@
             visibility: visible;
         }
 
-        .overlay img {
-            max-width: 80%;
-            max-height: 80%;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        .overlay img:not(#playAgainSuccess):not(#playAgainDefeat) {
+            /* Imagens de parabéns/derrota */
+            width: 100%; /* Ocupa 100% da largura do overlay */
+            height: 100%; /* Ocupa 100% da altura do overlay */
+            object-fit: contain; /* Garante que a imagem se ajuste sem cortar ou esticar demais */
+            position: absolute; /* Posiciona absolutamente para cobrir tudo */
+            top: 0;
+            left: 0;
+            border-radius: 0; /* Remove bordas arredondadas se houver */
         }
 
+        /* Esconde o parágrafo de mensagem no overlay se não for mais necessário */
         .overlay p {
-            color: white;
-            font-size: 2.5rem;
-            margin-top: 20px;
-            text-align: center;
+            display: none;
         }
 
-        .overlay button {
-            padding: 15px 30px;
-            font-size: 1.5rem;
-            background: linear-gradient(145deg, #8b4513, #6a2c0e);
-            color: white;
-            border: none;
-            border-radius: 5px;
+        /* Estilos para os botões "Jogar Novamente" dentro dos overlays */
+        .overlay img#playAgainSuccess,
+        .overlay img#playAgainDefeat {
             cursor: pointer;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
-        }
-
-        .overlay button:hover {
-            background: linear-gradient(145deg, #8b4513, #6a2c0e);
+            width: 300px; /* Tamanho fixo para o botão, ajuste conforme necessário */
+            height: auto; /* Mantém a proporção */
+            position: relative; /* Para que fique acima da imagem de fundo */
+            z-index: 1002; /* Garante que o botão esteja acima da imagem de parabéns/derrota */
+            margin-top: auto; /* Empurra o botão para a parte inferior usando flexbox */
+            margin-bottom: 20px; /* Espaçamento abaixo do botão */
         }
 
         @media (max-width: 768px) {
             .game-board {
                 width: 90vw;
+                padding-left: 10px; /* Ajuste para telas menores */
             }
+            .card {
+                width: 120px; /* Reduz o tamanho dos cards em telas menores */
+                height: 120px;
+            }
+        }
+
+        #restartButton {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: none;
+            background: none;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        #restartButton img {
+            width: 300px;
+            height: auto;
         }
     </style>
 </head>
@@ -231,7 +243,6 @@
     <button class="hamburger" id="hamburgerBtn">&#9776;</button>
     <div class="menu" id="menu">
         <a href="select.html">Voltar para seleção de jogos</a>
-        <a href="#">Sobre</a>
     </div>
 
     <div id="timer">60s</div>
@@ -241,40 +252,49 @@
     </div>
 
     <div id="successOverlay" class="overlay">
-        <img src="sucesso.jpg" alt="Parabéns, você ganhou!">
-        <button id="playAgainSuccess">Jogar Novamente</button>
+        <img src="16.jpg" alt="Parabéns, você ganhou!">
+        <img src="jn.png" alt="Jogar Novamente" id="playAgainSuccess">
     </div>
 
     <div id="defeatOverlay" class="overlay">
-        <img src="falha.jpg" alt="Tempo esgotado, tente novamente!">
-        <button id="playAgainDefeat">Jogar Novamente</button>
+        <img src="17.jpg" alt="Tempo esgotado, tente novamente!">
+        <img src="jn.png" alt="Jogar Novamente" id="playAgainDefeat">
     </div>
 
+    <button id="restartButton" onclick="initGame(); startGame();">
+        <img src="reiniciar.png" alt="Reiniciar Jogo">
+    </button>
+
     <script>
+        function voltarParaSelect() {
+            window.location.href = 'select.html';
+        }
+
         const images = [
-            "memoria1.jpg",
-            "memoria2.jpg",
-            "memoria3.jpg",
-            "memoria4.jpg",
-            "memoria5.jpg",
-            "memoria6.jpg",
+            "m1.png", "m2.png", "m3.png", "m4.png", "m5.png", "m6.png",
         ];
         let cards = [];
         let firstCard = null;
         let secondCard = null;
         let canClick = false;
         let matches = 0;
-        let currentPlayer = 1; // Você parece ter um jogo de um jogador, então currentPlayer pode ser simplificado
-        let scores = { 1: 0 }; // Ajustado para um jogador
-        let timeLeft = 60; // Tempo inicial do jogo
-        let timerInterval; // Variável para armazenar o intervalo do cronômetro
+        let currentPlayer = 1;
+        let scores = { 1: 0 };
+        let timeLeft = 60;
+        let timerInterval;
 
         const gameBoard = document.getElementById("gameBoard");
         const timerElement = document.getElementById("timer");
         const successOverlay = document.getElementById("successOverlay");
         const defeatOverlay = document.getElementById("defeatOverlay");
+
+        // Adiciona os event listeners para os botões "Jogar Novamente" nos overlays
         const playAgainSuccessBtn = document.getElementById("playAgainSuccess");
         const playAgainDefeatBtn = document.getElementById("playAgainDefeat");
+
+        playAgainSuccessBtn.addEventListener('click', voltarParaSelect);
+        playAgainDefeatBtn.addEventListener('click', voltarParaSelect);
+
 
         function initGame() {
             cards = [...images, ...images].sort(() => 0.5 - Math.random());
@@ -317,16 +337,16 @@
             firstCard = null;
             secondCard = null;
             matches = 0;
-            scores = { 1: 0 }; // Reinicia a pontuação
-            timeLeft = 60; // Reinicia o tempo
-            timerElement.textContent = `${timeLeft}s`; // Atualiza o display do cronômetro
-            hideOverlays(); // Garante que as sobreposições estejam ocultas
-            canClick = false; // Desabilita cliques até o início do jogo
+            scores = { 1: 0 };
+            timeLeft = 60;
+            timerElement.textContent = `${timeLeft}s`;
+            hideOverlays();
+            canClick = false;
+            clearInterval(timerInterval); // Limpa qualquer timer anterior
         }
 
         function startGame() {
             const cardsEl = document.querySelectorAll(".card");
-            // Vira todos os cards para mostrar as imagens por 3 segundos
             cardsEl.forEach(card => {
                 card.classList.add("flipped");
             });
@@ -335,33 +355,33 @@
                 cardsEl.forEach(card => {
                     card.classList.remove("flipped");
                 });
-                canClick = true; // Habilita cliques após a pré-visualização
-                startTimer(); // Inicia o cronômetro
+                canClick = true;
+                startTimer();
             }, 3000);
         }
 
         function revealCard(card) {
             if (!canClick || card.classList.contains("matched") || card.classList.contains("flipped")) return;
 
-            card.classList.add("flipped"); // Vira o card
+            card.classList.add("flipped");
 
             if (!firstCard) {
                 firstCard = card;
             } else {
                 secondCard = card;
-                canClick = false; // Desabilita cliques enquanto as cartas são comparadas
+                canClick = false;
 
                 if (firstCard.dataset.value === secondCard.dataset.value) {
                     firstCard.classList.add("matched");
                     secondCard.classList.add("matched");
-                    scores[1]++; // Assume um único jogador
+                    scores[1]++;
                     matches++;
-                    checkWin(); // Verifica se o jogo terminou
+                    checkWin();
                     resetTurn();
                 } else {
                     setTimeout(() => {
-                        firstCard.classList.remove("flipped"); // Vira de volta
-                        secondCard.classList.remove("flipped"); // Vira de volta
+                        firstCard.classList.remove("flipped");
+                        secondCard.classList.remove("flipped");
                         resetTurn();
                     }, 1000);
                 }
@@ -371,11 +391,11 @@
         function resetTurn() {
             firstCard = null;
             secondCard = null;
-            canClick = true; // Reabilita cliques
+            canClick = true;
         }
 
         function startTimer() {
-            clearInterval(timerInterval); // Garante que não há múltiplos cronômetros
+            clearInterval(timerInterval);
             timerInterval = setInterval(updateTimer, 1000);
         }
 
@@ -385,19 +405,19 @@
                 timerElement.textContent = `${timeLeft}s`;
             } else {
                 clearInterval(timerInterval);
-                endGame(false); // Tempo esgotado, derrota
+                endGame(false);
             }
         }
 
         function checkWin() {
-            if (matches === images.length) { // Se o número de pares combinados for igual ao número de imagens únicas
-                clearInterval(timerInterval); // Para o cronômetro
-                endGame(true); // Jogo ganho
+            if (matches === images.length) {
+                clearInterval(timerInterval);
+                endGame(true);
             }
         }
 
         function endGame(win) {
-            canClick = false; // Desabilita cliques
+            canClick = false;
             if (win) {
                 successOverlay.classList.add("show");
             } else {
@@ -410,31 +430,26 @@
             defeatOverlay.classList.remove("show");
         }
 
-        // Event listeners para os botões "Jogar Novamente"
-        playAgainSuccessBtn.addEventListener("click", () => {
-            window.location.href = 'select.html'; // Redireciona para a página select.html
+        // Script para o menu hambúrguer
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const menu = document.getElementById('menu');
+
+            hamburgerBtn.addEventListener('click', () => {
+                menu.classList.toggle('open');
+            });
+
+            // Adiciona um evento para fechar o menu ao clicar fora dele
+            document.addEventListener('click', (event) => {
+                if (!menu.contains(event.target) && !hamburgerBtn.contains(event.target)) {
+                    menu.classList.remove('open');
+                }
+            });
         });
 
-        playAgainDefeatBtn.addEventListener("click", () => {
-            window.location.href = 'select.html'; // Redireciona para a página select.html
-        });
-
-        // Inicialização
+        // Inicializa o jogo quando a página carrega
         initGame();
         startGame();
-
-        // Menu de hambúrguer
-        const hamburgerBtn = document.getElementById("hamburgerBtn");
-        const menu = document.getElementById("menu");
-
-        hamburgerBtn.addEventListener("click", () => {
-            menu.classList.toggle("open");
-        });
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js')
-            .then(reg => console.log("Service Worker registrado ✅"))
-            .catch(err => console.error("Erro ao registrar Service Worker ❌", err));
-        }
     </script>
 </body>
 </html>
